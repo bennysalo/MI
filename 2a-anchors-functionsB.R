@@ -1,9 +1,3 @@
-require(lavaan)
-require(purrr)
-
-
-
-
 # Function for running a single partial invariance model
   # Loadings and thresholds constrained to be equal except for the tested item
   # Will be compared to a strong invariance model
@@ -62,9 +56,6 @@ run_partial_fit <-  function(item, base_model = base_model, grouping = grouping,
 
 testFit <-  run_partial_fit(item = "i_financialManagement", base_model = Mod6facMI, grouping = "ageMedSplit", used_data = FinPrisonMales2)
 summary(testFit)
-
-################# FORTSÄTT HÄRIFRÅN
-
 
 # Function for running all partial models
   # Arguments:grouping    = which variable should be used to form groups - 
