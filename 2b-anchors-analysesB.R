@@ -86,7 +86,7 @@ find_worst_fit(partial_fits.closed)
 
 # Fit strong invariance models
 three_fits.age         <- run_3_models(grouping = "ageMedSplit", 
-                                       referent_items = "i_drugViolence", 
+                                       referent_items = referent_items.age, 
                                        base_model = drugMod2b, used_data = usedDrugs)
 
 three_fits.violence    <- run_3_models(grouping = "violentCrime", 
