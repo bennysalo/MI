@@ -72,39 +72,6 @@ run_all_partial_models <- function(grouping, base_model, item_vector, used_data)
   return(partial_models)
 }  
 
-
-# # TESTING parallel processing
-# print(Sys.time())
-# start<-Sys.time()
-# # run_all_partial_models_parallel <- function(grouping, base_model, item_vector, used_data) {
-# require(parallel)
-#   # Calculate the number of cores
-#   no_cores <- detectCores() - 1
-#   
-#   # Initiate cluster
-#   cl <- makeCluster(no_cores)
-#   
-#   clusterExport(cl, c("model_for_all", "unidim_items", "data_for_all"))
-#   clusterEvalQ(cl, library(lavaan))
-#   
-#   partial_models <- parLapply(cl  = cl, 
-#                               X   = unidim_items,
-#                               fun = run_partial_fit,
-#                               grouping   = "violentCrime",
-#                               base_model = model_for_all,
-#                               used_data  = data_for_all)
-#   
-#   stopCluster(cl)
-#   
-#   # name elements in list
-#   names(partial_models) <- item_vector
-#   partial_models
-# Sys.time()-start  
-# 
-# 
-# 
-# 
-
 # Function for getting pertinenet statistics from MULTIPLE likelihood ratio test
 # and sorting them accoring to unscaled chi difference
 # Arguments(List of fitted partial invariance models, Fitted strong partial model to compare against)
@@ -187,7 +154,7 @@ fit_strong_model <- function(grouping, base_model, used_data) {
 # Function for running 3 models: 1. single group, 2. configural invariance, and 3. strong invariance
 # Later functions will take this list as an argument
 # Arguments for this function:
-# A basic model definging factors and items
+# A basic model defining factors and items
 # The data used
 # The variable used to form and compare groups
 # A vector of referent items in the configural invariance model
@@ -208,8 +175,8 @@ run_3_models <- function (grouping, referent_items, base_model, used_data) {
   #  'std.lv = TRUE' will make sure that the first item in a factor is not chosen as a marker.
   #     The factor variances as defined in 'model' will however dictate the factor variances
   #  'group.equal = c("loadings", "thresholds")'
-  #     combined with 'group.partial' overriding this for all paramters that should stay free 
-  #     will set the referent item (and only the referent item) to be equal across groups    
+  #     combined with 'group.partial' overriding this for all parameters that should stay free 
+  #     will set the referent items (and only the referent items) to be equal across groups    
   
   
   # Extract a vector of the factors (the rows in the paramteter table that has the operator "=~",
@@ -230,7 +197,7 @@ run_3_models <- function (grouping, referent_items, base_model, used_data) {
   
   # Create vector of free loadings
   #  (rows in the parameter table with the operator "=~")
-  #     (exclude rows with the referent item on the right hand side columns)
+  #     (exclude rows with the referent items on the 'rhs' columns)
   #  (create of vector of character strings where the three columns are combined)
   
   free_loadings    <- subset(pt, op == "=~" & !(rhs %in% referent_items))
@@ -249,7 +216,7 @@ run_3_models <- function (grouping, referent_items, base_model, used_data) {
   
   # Configural invariance model
   # Referent item constrained to be equal by constraining all loadings to be equal
-  # Non-referent items free through 'group.partial' argument
+  # Non-referent items free via 'group.partial' argument
   the_3_fits[["configural"]]   <- cfa(model = modified_model,
                                         data = used_data,
                                         std.lv = TRUE,
@@ -289,3 +256,40 @@ compare_partials_to_strong <- function(partial_models_list, strong_model = stron
   # sort according to unscaled chi difference
   return(test_results[order(test_results$unscaled.chidiff), ])
 }
+
+
+
+# # TESTING parallel processing
+# print(Sys.time())
+# start<-Sys.time()
+# # run_all_partial_models_parallel <- function(grouping, base_model, item_vector, used_data) {
+# require(parallel)
+#   # Calculate the number of cores
+#   no_cores <- detectCores() - 1
+#   
+#   # Initiate cluster
+#   cl <- makeCluster(no_cores)
+#   
+#   clusterExport(cl, c("model_for_all", "unidim_items", "data_for_all"))
+#   clusterEvalQ(cl, library(lavaan))
+#   
+#   partial_models <- parLapply(cl  = cl, 
+#                               X   = unidim_items,
+#                               fun = run_partial_fit,
+#                               grouping   = "violentCrime",
+#                               base_model = model_for_all,
+#                               used_data  = data_for_all)
+#   
+#   stopCluster(cl)
+#   
+#   # name elements in list
+#   names(partial_models) <- item_vector
+#   partial_models
+# Sys.time()-start  
+# 
+# 
+# 
+# 
+
+
+
