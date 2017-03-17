@@ -105,52 +105,6 @@ get_referent_items <- function(fit_table) {
 
 
 
-
-
-
-
-
-
-# Function for fitting strong invariance model based on a base model
-#             base_model = the model in simple form of factors and their indicators
-#             grouping = which variable should be used to form groups
-#             used_data = the data that will be used)
-
-
-fit_strong_model <- function(grouping, base_model, used_data) {
-  # create a parameter table that can be used to identify pertinent parameters
-  pt    <- lavaanify(base_model)
-  
-  # Extract a vector of the factors (the rows in the paramteter table that has the operator "=~",
-  #   take the unique names in the 'left hand side' column from that subset of rows)
-  factors          <- subset(pt, op == "=~")
-  factors          <- unique(factors$lhs)
-  
-  # Create strings to be used in defining the configural model where
-  #  the factor variances are set to 1 in first and free in second group
-  #  the factor means are set to 0 in first and free in second group
-  factor_variances <- paste(factors, '~~ c(1, NA) *', factors, '\n', collapse = " ")
-  factor_means     <- paste(factors, 'c(0, NA) * 1 \n', collapse = " ")
-  
-  strong_model <-  paste(base_model,'\n',
-                         factor_variances,
-                         factor_means)
-  fit          <- cfa(model = strong_model,
-                      data = used_data,
-                      std.lv = TRUE,
-                      estimator = "WLSMV",
-                      group = grouping,
-                      group.equal = c("loadings", "thresholds"))
-}
-
-
-
-
-
-
-
-
-
 # Function for running 3 models: 1. single group, 2. configural invariance, and 3. strong invariance
 # Later functions will take this list as an argument
 # Arguments for this function:
