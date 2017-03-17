@@ -83,7 +83,7 @@ find_worst_fit <- function (partial_fits_list) {
     )}
   unscaled_chisqs <- map_df(.x = partial_fits_list, .f = grab_values)
   unscaled_chisqs$item <- names(partial_fits_list)
-  # Add a column with which factor the item belongs to
+  # Add a column for which factor the item belongs to
   pt <- dplyr::filter(.data = parTable(partial_fits_list[[1]]), 
                       op == "=~" & rhs %in% unscaled_chisqs$item) %>%
         select(rhs, lhs)
@@ -206,7 +206,16 @@ compare_partials_to_strong <- function(partial_models_list, strong_model = stron
   # Using purrr:map_df
   test_results            <- map_df(.x = partial_models_list, .f = get_LRT_stat, strong = strong_model)
   # name rows in data frame
-  row.names(test_results) <- names(partial_models_list)
+  test_results$item <- names(partial_models_list)
+  # add column with factor names
+  pt <- dplyr::filter(.data = parTable(partial_models_list[[1]]), 
+                      op == "=~" & rhs %in% test_results$item) %>%
+    select(rhs, lhs)
+  pv <- pt$lhs
+  names(pv) <- pt$rhs
+  
+  test_results$factor <- pv[test_results$item]
+ 
   # sort according to unscaled chi difference
   return(test_results[order(test_results$unscaled.chidiff), ])
 }
