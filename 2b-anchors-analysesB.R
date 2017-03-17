@@ -96,7 +96,11 @@ three_fits.reoffence   <- run_3_models(grouping = "reoffender",
                                        base_model = Mod6facMI, used_data = FinPrisonMales2)
 
 three_fits.closed      <- run_3_models(grouping = "allClosed", 
+<<<<<<< HEAD
                                        referent_item = referent_items.closed, 
+=======
+                                       referent_item = referent_items., 
+>>>>>>> a04c1f10bd7d474e5faa1488950ec6ec5f5a7ab4
                                        base_model = Mod6facMI, used_data = FinPrisonMales2)
 
 
