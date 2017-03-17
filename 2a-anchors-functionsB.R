@@ -200,7 +200,7 @@ compare_partials_to_strong <- function(partial_models_list, strong_model = stron
                       "Chisq diff"       = LRTstats$`Chisq diff`[2],
                       "Df diff"          = LRTstats$`Df diff`[2],
                       "p-value"          = LRTstats$`Pr(>Chisq)`[2],
-                      "unscaled.chidiff" = inspect(strong, "fit")[3]-inspect(partial, "fit")[3])
+                      "unscaled.chidiff" = lavInspect(strong, "fit")[3]-lavInspect(partial, "fit")[3])
     return(out)
   }
   # Using purrr:map_df
