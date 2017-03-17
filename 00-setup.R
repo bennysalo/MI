@@ -1,5 +1,5 @@
 # Setup access to dropbox in AWS EC2
-install.packages(c("lavaan", "semTools", "tidyverse", "psych"))
+install.packages(c("lavaan", "semTools", "simsem", "boot", "tidyverse", "psych"))
 
 library(RStudioAMI)
 linkDropbox()
