@@ -58,56 +58,52 @@ partial_fits.closed    <- run_all_partial_models(grouping = "allClosed",
 # hence that is the best referent item
 
 ## According to median split on age
-partial_fits_table.age <- find_worst_fit(partial_fits.age)
-referent_items.age     <- get_referent_items(partial_fits_table.age)
+partial_fits_table.age      <- find_worst_fit(partial_fits.age)
+referent_items.age          <- get_referent_items(partial_fits_table.age)
+
+## According to violent vs. non-violent crimes 
+partial_fits_table.violence <- find_worst_fit(partial_fits.violence)
+referent_items.violence     <- get_referent_items(partial_fits_table.violence)
+
+## According to first convictions vs repeat convictions
+partial_fits_table.previous <- find_worst_fit(partial_fits.previous)
+referent_items.previous     <- get_referent_items(partial_fits_table.previous)
+
+## According to reoffenders (this time) vs. non-reoffenders
+partial_fits_table.violence <- find_worst_fit(partial_fits.reoffence)
+referent_items.age          <- get_referent_items(partial_fits_table.age)
+
+## According to entire sentence in closed prison vs. open prison or conditional release
+partial_fits_table.closed   <- find_worst_fit(partial_fits.closed)
+referent_items.closed      <- get_referent_items(partial_fits_table.closed)
 
 
-
-group_by(partial_fits_table.age, factor) %>%
-  filter(chisq == max(chisq))
-
-
-
-
-## According to violent vs. non-violent crimes : "i_drugEffectWork"
-find_worst_fit(partial_fits.violence)
-
-## According to first convictions vs repeat convictions:  "i_drugViolence"
-find_worst_fit(partial_fits.previous)
-
-## According to reoffenders (this time) vs. non-reoffenders: "i_drugCriminalActs" 
-find_worst_fit(partial_fits.reoffence)
-
-## According to entire sentence in closed prison vs. open prison or conditional release: 
-#  "i_drugEffectWork"
-find_worst_fit(partial_fits.closed)
-
-
-
-# Fit strong invariance models
+# Fit models - including strong invariance models
 three_fits.age         <- run_3_models(grouping = "ageMedSplit", 
                                        referent_items = referent_items.age, 
-                                       base_model = drugMod2b, used_data = usedDrugs)
+                                       base_model = Mod6facMI, used_data = FinPrisonMales2)
 
 three_fits.violence    <- run_3_models(grouping = "violentCrime", 
-                                       referent_item = "i_drugEffectWork", 
-                                       base_model = drugMod2b, used_data = usedDrugs)
+                                       referent_item = referent_items.violence, 
+                                       base_model = Mod6facMI, used_data = FinPrisonMales2)
 
 three_fits.previous    <- run_3_models(grouping = "prevReoffence", 
-                                       referent_item = "i_drugViolence", 
-                                       base_model = drugMod2b, used_data = usedDrugs)
+                                       referent_item = referent_items.previous, 
+                                       base_model = Mod6facMI, used_data = FinPrisonMales2)
 
 three_fits.reoffence   <- run_3_models(grouping = "reoffender", 
-                                       referent_item = "i_drugCriminalActs", 
-                                       base_model = drugMod2b, used_data = usedDrugs)
+                                       referent_item = referent_items.reoffence, 
+                                       base_model = Mod6facMI, used_data = FinPrisonMales2)
 
 three_fits.closed      <- run_3_models(grouping = "allClosed", 
-                                       referent_item = "i_drugEffectWork", 
-                                       base_model = drugMod2b, used_data = usedDrugs)
+                                       referent_item = referent_items.closed, 
+                                       base_model = Mod6facMI, used_data = FinPrisonMales2)
 
 
 
 # Get the pertinent stats for comparing partial and strong invariance models
+# To check if the referent item (and others) can be deemed invariant using
+# likelihood ratio tests.
 
 compare_partials_to_strong(partial_fits.age,       three_fits.age[["strong"]]) 
 
