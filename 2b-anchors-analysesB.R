@@ -127,3 +127,9 @@ compare_partials_to_strong(partial_fits.previous,  three_fits.previous[["strong"
 compare_partials_to_strong(partial_fits.reoffence, three_fits.reoffence[["strong"]]) 
 
 compare_partials_to_strong(partial_fits.closed,    three_fits.closed[["strong"]]) 
+
+
+# Save workspace
+save.image("~/Dropbox/to aws/MI workspace after 2b.RData")
+
+
