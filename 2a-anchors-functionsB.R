@@ -51,12 +51,6 @@ run_partial_fit <-  function(item, base_model = base_model, grouping = grouping,
 }
 
 
-# Test
-# Funkar och ser korrekt ut.
-
-testFit <-  run_partial_fit(item = "i_financialManagement", base_model = Mod6facMI, grouping = "ageMedSplit", used_data = FinPrisonMales2)
-summary(testFit)
-
 # Function for running all partial models
   # Arguments:grouping    = which variable should be used to form groups - 
   #                         passed to function 'run_partial_fit.d'
@@ -121,10 +115,26 @@ find_worst_fit <- function (partial_fits_list) {
       "df" = lavInspect(x, what = "fit")[4]
     )}
   unscaled_chisqs <- map_df(.x = partial_fits_list, .f = grab_values)
-  row.names(unscaled_chisqs) <- names(partial_fits_list)
+  unscaled_chisqs$item <- names(partial_fits_list)
+  # Add a column with which factor the item belongs to
+  pt <- dplyr::filter(.data = parTable(partial_fits_list[[1]]), 
+                      op == "=~" & rhs %in% unscaled_chisqs$item) %>%
+        select(rhs, lhs)
+  pv <- pt$lhs
+  names(pv) <- pt$rhs
+  
+  unscaled_chisqs$factor <- pv[unscaled_chisqs$item]
+  # Order according to fit
   unscaled_chisqs[order(unscaled_chisqs$chisq, decreasing = TRUE), ]
 }
 
+
+get_referent_items <- function(fit_table) {
+  require(dplyr)
+  table <- group_by(fit_table, factor) %>%
+    filter(chisq == max(chisq))
+  table$item
+}
 
 
 

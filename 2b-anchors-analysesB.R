@@ -57,8 +57,17 @@ partial_fits.closed    <- run_all_partial_models(grouping = "allClosed",
 #   ... would also show as low chisq.diff when compared to strong model
 # hence that is the best referent item
 
-## According to median split on age: "i_drugViolence"
-find_worst_fit(partial_fits.age)
+## According to median split on age
+partial_fits_table.age <- find_worst_fit(partial_fits.age)
+referent_items.age     <- get_referent_items(partial_fits_table.age)
+
+
+
+group_by(partial_fits_table.age, factor) %>%
+  filter(chisq == max(chisq))
+
+
+
 
 ## According to violent vs. non-violent crimes : "i_drugEffectWork"
 find_worst_fit(partial_fits.violence)
