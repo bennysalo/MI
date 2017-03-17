@@ -1,11 +1,8 @@
-library(ggplot2)
-
-
 
 # 'Run bootstraps for configural model
 saved_seed <- .Random.seed
 
-n_samples <- 1000
+n_samples <- 10
 
 print(Sys.time())
 start<-Sys.time()
