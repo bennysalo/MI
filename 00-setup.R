@@ -5,6 +5,7 @@ excludeSyncDropbox("*")
 includeSyncDropbox("to aws")
 
 library(purrr)
+library(dplyr)
 library(lavaan)
 library(semTools)
 library(psych)
