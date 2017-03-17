@@ -1,5 +1,3 @@
-library(purrr)
-library(lavaan)
 
 # Define preset objects that will be used in all five groupings
 
@@ -21,9 +19,9 @@ partial_fits.age       <- run_all_partial_models(grouping = "ageMedSplit",
 
 Sys.time()-start
 
-
 print(Sys.time())
 start<-Sys.time()
+
 clusterExport(cl, c("model_for_all", "unidim_items", "data_for_all"))
 partial_fits.violence  <- run_all_partial_models_parallel(grouping = "violentCrime",
                                                      base_model = model_for_all,
@@ -31,21 +29,37 @@ partial_fits.violence  <- run_all_partial_models_parallel(grouping = "violentCri
                                                      used_data = data_for_all)
 Sys.time()-start
 
+print(Sys.time())
+start<-Sys.time()
+
 
 partial_fits.previous  <- run_all_partial_models(grouping = "prevReoffence",
                                                      base_model = model_for_all,
                                                      item_vector = unidim_items,
                                                      used_data = data_for_all)
 
+Sys.time()-start
+
+print(Sys.time())
+start<-Sys.time()
+
 partial_fits.reoffence <- run_all_partial_models(grouping = "reoffender",
                                                      base_model = model_for_all,
                                                      item_vector = unidim_items,
                                                      used_data = data_for_all)
 
+Sys.time()-start
+
+print(Sys.time())
+start<-Sys.time()
+
 partial_fits.closed    <- run_all_partial_models(grouping = "allClosed",
                                                      base_model = model_for_all,
                                                      item_vector = drug_items,
                                                      used_data = data_for_all)
+Sys.time()-start
+
+
 
 # Order partial fits according to how bad the fit is (higher chi-square)
 # (unscaled chis-square is used)
@@ -96,11 +110,7 @@ three_fits.reoffence   <- run_3_models(grouping = "reoffender",
                                        base_model = Mod6facMI, used_data = FinPrisonMales2)
 
 three_fits.closed      <- run_3_models(grouping = "allClosed", 
-<<<<<<< HEAD
                                        referent_item = referent_items.closed, 
-=======
-                                       referent_item = referent_items., 
->>>>>>> a04c1f10bd7d474e5faa1488950ec6ec5f5a7ab4
                                        base_model = Mod6facMI, used_data = FinPrisonMales2)
 
 
