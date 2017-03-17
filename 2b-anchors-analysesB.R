@@ -22,8 +22,7 @@ Sys.time()-start
 print(Sys.time())
 start<-Sys.time()
 
-clusterExport(cl, c("model_for_all", "unidim_items", "data_for_all"))
-partial_fits.violence  <- run_all_partial_models_parallel(grouping = "violentCrime",
+partial_fits.violence  <- run_all_partial_models(grouping = "violentCrime",
                                                      base_model = model_for_all,
                                                      item_vector = unidim_items,
                                                      used_data = data_for_all)
