@@ -13,6 +13,7 @@ library(ggplot2)
 # Takes argument 'fitted.model' which is a fitted cfa model (using lavaan)
 
 coef_diff <- function(fitted.model) {
+  require(lavaan)
 
   # Pick number of obervations per group, used for calculating pooled factor variance
   n.g1 <- lavInspect(fitted.model, what = "nobs")[1]
@@ -26,7 +27,8 @@ coef_diff <- function(fitted.model) {
  factors <- unique(factors$lhs)
 
   # Pick the rows in pt that has the operator "~~" (variances) AND has one of the factors in "lhs"
- factor.vars <- subset(pt, op == "~~" & lhs %in% factors)
+  # and where the lhs is the same as rhs (exclude covariances)
+ factor.vars <- subset(pt, op == "~~" & lhs %in% factors & lhs == rhs)
  factor.vars <- factor.vars[c("lhs", "op",  "rhs", "group", "est")]
   # Split into two groups 
  factor.vars1 <- subset(factor.vars, group == 1)
