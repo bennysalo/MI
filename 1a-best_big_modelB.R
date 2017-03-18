@@ -24,7 +24,6 @@ employment =~ i_workHistory + i_eduNeed + i_eduAttitude + i_workAttitude +
   # calculate polychoric correlation matrix
   polycor_matrix <- lavCor(data_Mod6facMI)
   # Check for high polychoric squared multiple correlations
-  require(psych)
   smc(polycor_matrix)[order(smc(polycor_matrix))]
   KMO(polycor_matrix)
   
@@ -36,10 +35,9 @@ summary(CFA6facMI, fit = T)
 head(modindices(CFA6facMI, sort. = TRUE))
 
 # No changes from this model
-
-# Save results so far
-save.image("~/Dropbox/to aws/MI workspace after 1a.RData")
-
+# Clean up environment
+rm(list = c("data_Mod6facMI", "items", "polycor_matrix"))
+ls()
 
 
 

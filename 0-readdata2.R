@@ -106,3 +106,12 @@ noDrugs   <- cbind(noDrugs, as.ordered(rep(0, times = nrow(noDrugs))))
 names(noDrugs)[108] <- "ifact_drugUse"
 
 FinPrisonMales2 <- rbind(noDrugs, usedDrugs)
+
+
+# Clean up environment. Delete objects that are not needed anymore.
+rm(list = c("drugFit2b", "drugMod2b", "FinPrisonData", "FinPrisonMales", "fs_drugUse", "ifact_drugUse", "noDrugs"))
+ls()
+
+
+
+
