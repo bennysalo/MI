@@ -28,7 +28,7 @@
   
   # Function for getting the loading and threshold for a given item
   # Argument: the name of the item
-  get_item_parameters <- function(item) {
+  get_item_parameters <- function(base_model, item) {
   
   pt           <- lavaanify(base_model)
     
@@ -42,38 +42,6 @@
   return(free_parameters)
   }
   
-  # Function for doing all tests relating to finding referent items
-  analyses_step_2 <- function(base_model, used_data, grouping, item_vector) {
-    results <- list()
-    # 1. Run partial models
-    start<-Sys.time()
-    paste("Fitting partial invariance models. Starting at", start)
-    results[["partial_fits"]] <- run_all_partial_models(base_model, used_data, grouping, item_vector)
-    paste("Fitting partial invariance models completed. Time difference of", round(Sys.time()-start, digits = 2))
-    # 2. Run strong invariance model
-    start<-Sys.time()
-    paste("Fitting strong invariance model. Starting at", start)
-    results[["strong fit"]]   <- run_strong_model(base_model, used_data, grouping, item_vector)
-    paste("Fitting strong invariance model completed. Time difference of", round(Sys.time()-start, digits = 2))
-    # 3. Order according to unscaled chi-square difference
-    # Order partial fits according to how bad the fit is (higher chi-square)
-    # (unscaled chis-square is used)
-    # worse fits means that constraining all other items leads to worse fit 
-    # - model would benefit from keeping them free
-    # i.e.  keeping the tested item free does not improve fit as much
-    # - parameters are close enough in the two groups that 
-    #   ... fit is not reduced very much if they are constrained to be equal
-    #   ... would also show as low chisq.diff when compared to strong model
-    # hence that is the best referent item
-    # This in turn also means small difference in chisq between partial and strong invariance models
-    results[["partial invariance table"]] <- compare_partials_to_strong(partial_models_list = results[["partial_fits"]], 
-                                                                        strong_model = results[["strong fit"]])
-    # 4. Assign referent items
-    results[["referent items"]] <- get_referent_items(fit_table = results[["partial invariance table"]])
-  }
-  
-  
-  
 
 
 # Function for running a single partial invariance model
@@ -85,11 +53,11 @@
   #             used_data  = the data that will be used)
 
 
-run_partial_fit <-  function(base_model = base_model, used_data, grouping = grouping, item){
+run_partial_fit <-  function(base_model = base_model, used_data = used_data, grouping = grouping, item){
   # create a parameter table that can be used to identify pertinent parameters
 
   modified_model  <- modify_means_and_var_to_strong(base_model)
-  free_parameters <- get_item_parameters(item)
+  free_parameters <- get_item_parameters(base_model, item)
   
   # fit model - constrain loadings and thresholds to be equal ('group.equal') and 
   # override this for 'free_parameters' ('group.partial')
@@ -113,7 +81,8 @@ run_partial_fit <-  function(base_model = base_model, used_data, grouping = grou
   #           used_data   = data to use
   #                         passed to function 'run_partial_fit'
 
-run_all_partial_models <- function(base_model, used_data, grouping, item_vector) {
+run_all_partial_models <- function(base_model = base_model, used_data = used_data, 
+                                   grouping = grouping, item_vector = item_vector) {
   require(purrr)
   partial_models <- map(.x = item_vector, 
                         .f = run_partial_fit, 
@@ -189,9 +158,15 @@ get_referent_items <- function(fit_table) {
 analyses_step_2 <- function(base_model, used_data, grouping, item_vector) {
   results <- list()
   # 1. Run partial models
+  start<-Sys.time()
+  paste("Fitting partial invariance models. Starting at", start)
   results[["partial_fits"]] <- run_all_partial_models(base_model, used_data, grouping, item_vector)
+  paste("Fitting partial invariance models completed. Time difference of", round(Sys.time()-start, digits = 2))
   # 2. Run strong invariance model
+  start<-Sys.time()
+  paste("Fitting strong invariance model. Starting at", start)
   results[["strong fit"]]   <- run_strong_model(base_model, used_data, grouping, item_vector)
+  paste("Fitting strong invariance model completed. Time difference of", round(Sys.time()-start, digits = 2))
   # 3. Order according to unscaled chi-square difference
   # Order partial fits according to how bad the fit is (higher chi-square)
   # (unscaled chis-square is used)
@@ -208,7 +183,8 @@ analyses_step_2 <- function(base_model, used_data, grouping, item_vector) {
   # 4. Assign referent items
   results[["referent items"]] <- get_referent_items(fit_table = results[["partial invariance table"]])
 }
-  
+
+
 
 # 
 # 
