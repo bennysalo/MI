@@ -37,6 +37,8 @@ head(modindices(CFA6facMI, sort. = TRUE))
 
 # No changes from this model
 
+# Save results so far
+save.image("~/Dropbox/to aws/MI workspace after 1a.RData")
 
 
 
