@@ -4,6 +4,10 @@ library(foreign, pos=4)
 FinPrisonData <- read.spss("../Dropbox/to aws/data/recidivists and nonrecidivsts all cases.sav", 
                           use.value.labels=TRUE, max.value.labels=Inf, to.data.frame=TRUE)
 
+# From local machine
+# FinPrisonData <- read.spss("C:/Users/benny_000/Dropbox/to aws/data/recidivists and nonrecidivsts all cases.sav", 
+# use.value.labels=TRUE, max.value.labels=Inf, to.data.frame=TRUE)
+
 # set NA on i_partnerRelation and i_parenting as 0 = no problem
 FinPrisonData$i_partnerRelation <- ifelse(is.na(FinPrisonData$i_partnerRelation), 0, FinPrisonData$i_partnerRelation)
 FinPrisonData$i_parenting       <- ifelse(is.na(FinPrisonData$i_parenting),       0, FinPrisonData$i_parenting)
@@ -27,7 +31,7 @@ FinPrisonData$ic_accomodation <- Recode(FinPrisonData$ic_accomodation,
                                         recodes = "0 = 0; c(1, 2) = 1; c(3, 4) = 2")
 
 FinPrisonData$ic_drugUseAndEffects <- Recode(FinPrisonData$ic_drugUseAndEffects, 
-                                             recodes = "c(0) = 0; 1:7 = 1; 8:hi = 2")
+                                             recodes = "0 = 0; 1:7 = 1; 8:hi = 2")
 
 FinPrisonData$ic_drugHealthRisk <- Recode(FinPrisonData$ic_drugHealthRisk, 
                                         recodes = "0 = 0; c(1, 2) = 1; c(3, 4) = 2")
