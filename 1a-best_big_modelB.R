@@ -24,6 +24,7 @@ employment =~ i_workHistory + i_eduNeed + i_eduAttitude + i_workAttitude +
   # calculate polychoric correlation matrix
   polycor_matrix <- lavCor(data_Mod6facMI)
   # Check for high polychoric squared multiple correlations
+  require(psych)
   smc(polycor_matrix)[order(smc(polycor_matrix))]
   KMO(polycor_matrix)
   
