@@ -165,7 +165,7 @@ analyses_step_2 <- function(base_model, used_data, grouping, item_vector) {
   # 2. Run strong invariance model
   start<-Sys.time()
   paste("Fitting strong invariance model. Starting at", start)
-  results[["strong fit"]]   <- run_strong_model(base_model, used_data, grouping, item_vector)
+  results[["strong fit"]]   <- run_strong_model(base_model, used_data, grouping)
   paste("Fitting strong invariance model completed. Time difference of", round(Sys.time()-start, digits = 2))
   # 3. Order according to unscaled chi-square difference
   # Order partial fits according to how bad the fit is (higher chi-square)
