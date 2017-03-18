@@ -39,5 +39,6 @@ head(modindices(CFA6facMI, sort. = TRUE))
 rm(list = c("data_Mod6facMI", "items", "polycor_matrix"))
 ls()
 
-
+# Save results so far
+save.image("~/Dropbox/to aws/MI workspace after 1a.RData")
 
