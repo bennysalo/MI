@@ -15,10 +15,10 @@ data_for_all <- FinPrisonMales2
 # Median split on AGE
 print(Sys.time())
 start<-Sys.time()
-analyses_step_2(base_model = model_for_all, 
-                used_data  = data_for_all, 
-                grouping   = "ageMedSplit", 
-                item_vector = unidim_items)
+results_step2.age <- analyses_step_2(base_model = model_for_all, 
+                     used_data  = data_for_all, 
+                     grouping   = "ageMedSplit", 
+                     item_vector = unidim_items)
 
 Sys.time()-start
 
@@ -29,7 +29,7 @@ load("~/Dropbox/to aws/MI workspace after 1a.RData")
 # ### VIOLENCE
 print(Sys.time())
 start<-Sys.time()
-analyses_step_2(base_model = model_for_all, 
+results_step2.violence <- analyses_step_2(base_model = model_for_all, 
                 used_data  = data_for_all, 
                 grouping   = "violentCrime", 
                 item_vector = unidim_items)
@@ -44,7 +44,7 @@ load("~/Dropbox/to aws/MI workspace after 1a.RData")
 
 print(Sys.time())
 start<-Sys.time()
-analyses_step_2(base_model = model_for_all, 
+results_step2.previous <- analyses_step_2(base_model = model_for_all, 
                 used_data  = data_for_all, 
                 grouping   = "prevReoffence", 
                 item_vector = unidim_items)
@@ -60,7 +60,7 @@ load("~/Dropbox/to aws/MI workspace after 1a.RData")
 
 print(Sys.time())
 start<-Sys.time()
-analyses_step_2(base_model = model_for_all, 
+results_step2.reoffender <- analyses_step_2(base_model = model_for_all, 
                 used_data  = data_for_all, 
                 grouping   = "reoffender", 
                 item_vector = unidim_items)
@@ -74,7 +74,7 @@ load("~/Dropbox/to aws/MI workspace after 1a.RData")
 # ### CLOSED
 print(Sys.time())
 start<-Sys.time()
-analyses_step_2(base_model = model_for_all, 
+results_step2.closed <- analyses_step_2(base_model = model_for_all, 
                 used_data  = data_for_all, 
                 grouping   = "allClosed", 
                 item_vector = unidim_items)
