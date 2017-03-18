@@ -42,6 +42,37 @@
   return(free_parameters)
   }
   
+  # Function for doing all tests relating to finding referent items
+  analyses_step_2 <- function(base_model, used_data, grouping, item_vector) {
+    results <- list()
+    # 1. Run partial models
+    start<-Sys.time()
+    paste("Fitting partial invariance models. Starting at", start)
+    results[["partial_fits"]] <- run_all_partial_models(base_model, used_data, grouping, item_vector)
+    paste("Fitting partial invariance models completed. Time difference of", round(Sys.time()-start, digits = 2))
+    # 2. Run strong invariance model
+    start<-Sys.time()
+    paste("Fitting strong invariance model. Starting at", start)
+    results[["strong fit"]]   <- run_strong_model(base_model, used_data, grouping, item_vector)
+    paste("Fitting strong invariance model completed. Time difference of", round(Sys.time()-start, digits = 2))
+    # 3. Order according to unscaled chi-square difference
+    # Order partial fits according to how bad the fit is (higher chi-square)
+    # (unscaled chis-square is used)
+    # worse fits means that constraining all other items leads to worse fit 
+    # - model would benefit from keeping them free
+    # i.e.  keeping the tested item free does not improve fit as much
+    # - parameters are close enough in the two groups that 
+    #   ... fit is not reduced very much if they are constrained to be equal
+    #   ... would also show as low chisq.diff when compared to strong model
+    # hence that is the best referent item
+    # This in turn also means small difference in chisq between partial and strong invariance models
+    results[["partial invariance table"]] <- compare_partials_to_strong(partial_models_list = results[["partial_fits"]], 
+                                                                        strong_model = results[["strong fit"]])
+    # 4. Assign referent items
+    results[["referent items"]] <- get_referent_items(fit_table = results[["partial invariance table"]])
+  }
+  
+  
   
 
 
@@ -96,10 +127,10 @@ run_all_partial_models <- function(base_model, used_data, grouping, item_vector)
 
 # Function for fitting strong invariance model
 
-run_strong_model <- function((base_model, used_data, grouping)  {
+run_strong_model <- function(base_model, used_data, grouping)  {
   
   modified_model  <- modify_means_and_var_to_strong(base_model)
-  strong_invariance_ fit <- cfa(model     = modified_model,
+  strong_invariance_fit <- cfa(model     = modified_model,
                                 data      = used_data,
                                 std.lv    = TRUE,
                                 estimator = "WLSMV",
@@ -153,13 +184,28 @@ get_referent_items <- function(fit_table) {
   return(table$item)
 }
 
+
 # Function for doing all tests relating to finding referent items
 analyses_step_2 <- function(base_model, used_data, grouping, item_vector) {
   results <- list()
+  # 1. Run partial models
   results[["partial_fits"]] <- run_all_partial_models(base_model, used_data, grouping, item_vector)
+  # 2. Run strong invariance model
   results[["strong fit"]]   <- run_strong_model(base_model, used_data, grouping, item_vector)
+  # 3. Order according to unscaled chi-square difference
+  # Order partial fits according to how bad the fit is (higher chi-square)
+  # (unscaled chis-square is used)
+  # worse fits means that constraining all other items leads to worse fit 
+  # - model would benefit from keeping them free
+  # i.e.  keeping the tested item free does not improve fit as much
+  # - parameters are close enough in the two groups that 
+  #   ... fit is not reduced very much if they are constrained to be equal
+  #   ... would also show as low chisq.diff when compared to strong model
+  # hence that is the best referent item
+  # This in turn also means small difference in chisq between partial and strong invariance models
   results[["partial invariance table"]] <- compare_partials_to_strong(partial_models_list = results[["partial_fits"]], 
                                                                       strong_model = results[["strong fit"]])
+  # 4. Assign referent items
   results[["referent items"]] <- get_referent_items(fit_table = results[["partial invariance table"]])
 }
   
