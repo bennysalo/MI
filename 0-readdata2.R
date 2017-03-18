@@ -26,7 +26,7 @@ FinPrisonData$ic_drugHealthRisk <- FinPrisonData$i_drugIntravenous + FinPrisonDa
 
 
 # Recode into scale 0,1,2 with the 0 as 0, up to a mean of 1 = 1, above = 2
-
+require(car)
 FinPrisonData$ic_accomodation <- Recode(FinPrisonData$ic_accomodation, 
                                         recodes = "0 = 0; c(1, 2) = 1; c(3, 4) = 2")
 
