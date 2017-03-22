@@ -28,16 +28,16 @@
   
   # Function for getting the loading and threshold for a given item
   # Argument: the name of the item
-  get_item_parameters <- function(base_model, item) {
+  get_item_parameters <- function(base_model, items) {
   
   pt           <- lavaanify(base_model)
     
-  free_loading <- subset(pt, op == "=~" & rhs == item)
-  free_loading <- paste(free_loading$lhs, free_loading$op, free_loading$rhs)
+  free_loadings <- subset(pt, op == "=~" & rhs %in% items)
+  free_loadings <- paste(free_loadings$lhs, free_loadings$op, free_loadings$rhs)
   
-  free_parameters <- c(free_loading,
-                       paste(item, '|t1'),
-                       paste(item, '|t2'))
+  free_parameters <- c(free_loadings,
+                       paste(items, '|t1'),
+                       paste(items, '|t2'))
   
   return(free_parameters)
   }
@@ -108,6 +108,12 @@ run_strong_model <- function(base_model, used_data, grouping)  {
 
 }
 
+
+
+
+
+
+
 compare_partials_to_strong <- function(partial_models_list, strong_model) {
   # Function for getting pertinenet statistics from ONE likelihood ratio test
   # Arguments(Fitted partial invarianc emodel, Fitted strong partial model)
@@ -152,6 +158,43 @@ get_referent_items <- function(fit_table) {
   
   return(table$item)
 }
+
+
+run_configural_model <- function(base_model, used_data, grouping, referent_items)  {
+  
+    #  'std.lv = TRUE' will make sure that the first item in a factor is not chosen as a marker.
+    #     The factor variances as defined in 'model' will however dictate the factor variances
+    #  'group.equal = c("loadings", "thresholds")'
+    #     combined with 'group.partial' overriding this for all parameters that should stay free
+    #     will set the referent items (and only the referent items) to be equal across groups
+  
+  modified_model  <- modify_means_and_var_to_strong(base_model)
+  
+  referent_parameters <- get_item_parameters(base_model, referent_items)
+  
+  pt           <- lavaanify(base_model)
+  loadings     <- subset(pt, op == "=~")$rhs
+    
+  all_parameters <- c(loadings,
+                      paste(items, '|t1'),
+                      paste(items, '|t2'))  
+  
+  # select the parameters not among the referent paramters, they will be freed through 'group.partial'
+  free_parameters <- all_parameters[!(all_parameters %in% referent_parameters)]
+    
+    
+  
+  configural_invariance_fit <- cfa(model     = modified_model,
+                               data      = used_data,
+                               std.lv    = TRUE,
+                               estimator = "WLSMV",
+                               group     = grouping,
+                               group.equal = c("loadings", "thresholds"),
+                               group.partial = free_parameters)
+  return(configural_invariance_fit)
+}
+
+
 
 
 # Function for doing all tests relating to finding referent items
