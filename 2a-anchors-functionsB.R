@@ -182,6 +182,7 @@ analyses_step_2 <- function(base_model, used_data, grouping, item_vector) {
                                                                       strong_model = results[["strong fit"]])
   # 4. Assign referent items
   results[["referent items"]] <- get_referent_items(fit_table = results[["partial invariance table"]])
+  return(results)
 }
 
 
