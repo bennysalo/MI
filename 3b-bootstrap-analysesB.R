@@ -4,10 +4,19 @@ saved_seed <- .Random.seed
 
 n_samples <- 10
 
+RNGkind("L'Ecuyer-CMRG")
+
+### Add iseed argument
+
+
 print(Sys.time())
 start<-Sys.time()
-boot_drugs.age        <- bootstrapLavaan(three_fits.age[["configural"]], 
+boot_drugs.age        <- bootstrapLavaan(results_step2.age[["configural fit"]], 
                                          R = n_samples, type="ordinary", FUN = coef_diff)
+
+#### edited up to here
+
+
 boot_drugs.violence   <- bootstrapLavaan(three_fits.violence[["configural"]], 
                                          R = n_samples, type="ordinary", FUN = coef_diff)
 boot_drugs.previous   <- bootstrapLavaan(three_fits.previous[["configural"]], 
