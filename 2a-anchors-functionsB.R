@@ -197,6 +197,8 @@ run_configural_model <- function(base_model, used_data, grouping, referent_items
 
 
 
+
+
 # Function for doing all tests relating to finding referent items
 analyses_step_2 <- function(base_model, used_data, grouping, item_vector) {
   results <- list()
@@ -226,6 +228,7 @@ analyses_step_2 <- function(base_model, used_data, grouping, item_vector) {
   # 4. Assign referent items
   results[["referent items"]] <- get_referent_items(fit_table = results[["partial invariance table"]])
   results[["configural fit"]] <- run_configural_model(base_model, used_data, grouping, results[["referent items"]])
+  results[["single group"]] <- cfa(base_model, data = used_data, td.lv = TRUE, estimator = "WLSMV")
   return(results)
 }
 
