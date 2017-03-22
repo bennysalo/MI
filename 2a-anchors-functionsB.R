@@ -148,7 +148,7 @@ get_referent_items <- function(fit_table) {
   require(dplyr)
   
   table <- group_by(fit_table, factor) %>%
-    filter(chisq == max(chisq))
+    filter(Chisq == max(Chisq))
   
   return(table$item)
 }
