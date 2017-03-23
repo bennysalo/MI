@@ -173,8 +173,12 @@ run_configural_model <- function(base_model, used_data, grouping, referent_items
   referent_parameters <- get_item_parameters(base_model, referent_items)
   
   pt           <- lavaanify(base_model)
-  loadings     <- subset(pt, op == "=~")$rhs
-    
+  
+  loadings     <- subset(pt, op == "=~")
+  items        <- loadings$rhs
+  
+  loadings     <- paste(loadings$lhs, loadings$op, loadings$rhs)
+  
   all_parameters <- c(loadings,
                       paste(items, '|t1'),
                       paste(items, '|t2'))  
@@ -203,7 +207,7 @@ run_configural_model <- function(base_model, used_data, grouping, referent_items
 analyses_step_2 <- function(base_model, used_data, grouping, item_vector) {
   results <- list()
   # 1. Run partial models
-  results[["partial_fits"]] <- run_all_partial_models(base_model, used_data, grouping, item_vector)
+  results[["partial fits"]] <- run_all_partial_models(base_model, used_data, grouping, item_vector)
   # 2. Run strong invariance model
   results[["strong fit"]]   <- run_strong_model(base_model, used_data, grouping)
   # 3. Order according to unscaled chi-square difference
@@ -221,6 +225,8 @@ analyses_step_2 <- function(base_model, used_data, grouping, item_vector) {
                                                                       strong_model = results[["strong fit"]])
   # 4. Assign referent items
   results[["referent items"]] <- get_referent_items(fit_table = results[["partial invariance table"]])
+  results[["significance test referent items"]] <- subset(results[["partial invariance table"]],
+                                                          item %in% results[["referent items"]])
   results[["configural fit"]] <- run_configural_model(base_model, used_data, grouping, results[["referent items"]])
   results[["single group"]] <- cfa(base_model, data = used_data, td.lv = TRUE, estimator = "WLSMV")
   return(results)
