@@ -228,7 +228,8 @@ analyses_step_2 <- function(base_model, used_data, grouping, item_vector) {
   results[["significance test referent items"]] <- subset(results[["partial invariance table"]],
                                                           item %in% results[["referent items"]])
   results[["configural fit"]] <- run_configural_model(base_model, used_data, grouping, results[["referent items"]])
-  results[["single group"]] <- cfa(base_model, data = used_data, td.lv = TRUE, estimator = "WLSMV")
+  results[["test strong invariance"]] <-lavTestLRT(results[["configural fit"]], results[["strong fit"]], 
+                                                   method = "satorra.bentler.2010") 
   return(results)
 }
 
