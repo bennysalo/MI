@@ -7,32 +7,37 @@
 rm(list = ls())
 
 load("~/Dropbox/to aws/MI after 2b - age.RData")
+load("~/Dropbox/to aws/bootstrap functions.RData")
 
-results_step2.age <- run_my_bootstraps(results_step2.age, 10)
+results_step2.age <- run_my_bootstraps(results_step2.age, n_samples = n)
 save.image("~/Dropbox/to aws/MI after 2b - age.RData")
 rm(list = ls())
 
 load("~/Dropbox/to aws/MI after 2b - violence.RData")
+load("~/Dropbox/to aws/bootstrap functions.RData")
 
-results_step2.violence <- run_my_bootstraps(results_step2.violence, 10)
+results_step2.violence <- run_my_bootstraps(results_step2.violence, n_samples = n)
 save.image("~/Dropbox/to aws/MI after 2b - violence.RData")
 rm(list = ls())
 
 load("~/Dropbox/to aws/MI after 2b - previous.RData")
+load("~/Dropbox/to aws/bootstrap functions.RData")
 
 results_step2.previous <- run_my_bootstraps(results_step2.previous)
 save.image("~/Dropbox/to aws/MI after 2b - previous.RData")
 rm(list = ls())
 
 load("~/Dropbox/to aws/MI after 2b - reoffence.RData")
+load("~/Dropbox/to aws/bootstrap functions.RData")
 
-results_step2.reoffence <- run_my_bootstraps(results_step2.reoffence, 10)
+results_step2.reoffence <- run_my_bootstraps(results_step2.reoffence, n_samples = n)
 save.image("~/Dropbox/to aws/MI after 2b - reoffence.RData")
 rm(list = ls())
 
 load("~/Dropbox/to aws/MI after 2b - closed.RData")
+load("~/Dropbox/to aws/bootstrap functions.RData")
 
-results_step2.closed <- run_my_bootstraps(results_step2.closed, 10)
+results_step2.closed <- run_my_bootstraps(results_step2.closed, n_samples = n)
 save.image("~/Dropbox/to aws/MI after 2b - closed.RData")
 rm(list = ls())
   

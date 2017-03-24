@@ -1,11 +1,8 @@
-library(lavaan)
-library(boot)
-library(simsem)
-library(semTools)
-library(ggplot2)
+# Empty workspace and popluate it with functions for bootstrap
+# The functions are simply saved in a workspace in the end of the script.
+# The workspace will contain the object 'n' that decides the number of bootstrap draws
 
-
-
+rm(list = ls())
 
 # Function for calculating standardized loading and threshold differences from a configural model
 # To be used with 'bootstrapLavaan' to extract these parameters from every bootstrap,
@@ -122,7 +119,9 @@ run_my_bootstraps <- function(results_list, n_samples = 10) {
   return(results_list)
 }
 
+# Set number of bootstrap draws
 
-
+n <- 10
+save.image("~/Dropbox/to aws/bootstrap functions.RData")
 
 
