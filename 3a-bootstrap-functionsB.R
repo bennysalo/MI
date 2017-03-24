@@ -112,5 +112,17 @@ create_sdiff_CI_df <- function(original_model, bootstrapped_values) {
   out
 }
 
+# Function for combining bootstrap code
+run_my_bootstraps <- function(results_list, n_samples = 10) {
+  start_time <- Sys.time()
+  results_list[["bootstrapped coefs"]] <- 
+    bootstrapLavaan(results_list[["configural fit"]], 
+                    R = n_samples, type="ordinary", FUN = coef_diff, verbose = TRUE)
+  results_list[["bootstrap time"]]     <- round(Sys.time()-start_time, digits = 2)
+  return(results_list)
+}
+
+
+
 
 

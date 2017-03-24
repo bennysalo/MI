@@ -1,9 +1,6 @@
 
 # 'Run bootstraps for configural model
 
-
-n_samples <- 10
-
 # RNGkind("L'Ecuyer-CMRG")
 # saved_seed <- .Random.seed
 
@@ -11,22 +8,13 @@ rm(list = ls())
 
 load("~/Dropbox/to aws/MI after 2b - age.RData")
 
-run_my_bootstraps <- function(results_list, n_samples = 10) {
-  start_time <- Sys.time()
-  results_list[["bootstrapped coefs"]] <- 
-  bootstrapLavaan(results_list[["configural fit"]], 
-                  R = n_samples, type="ordinary", FUN = coef_diff, verbose = TRUE)
-  results_list[["bootstrap time"]]     <- round(Sys.time()-start_time, digits = 2)
-  return(results_list)
-  }
-
-results_step2.age <- run_my_bootstraps(results_step2.age)
+results_step2.age <- run_my_bootstraps(results_step2.age, 10)
 save.image("~/Dropbox/to aws/MI after 2b - age.RData")
 rm(list = ls())
 
 load("~/Dropbox/to aws/MI after 2b - violence.RData")
 
-results_step2.violence <- run_my_bootstraps(results_step2.violence)
+results_step2.violence <- run_my_bootstraps(results_step2.violence, 10)
 save.image("~/Dropbox/to aws/MI after 2b - violence.RData")
 rm(list = ls())
 
@@ -38,13 +26,13 @@ rm(list = ls())
 
 load("~/Dropbox/to aws/MI after 2b - reoffence.RData")
 
-results_step2.reoffence <- run_my_bootstraps(results_step2.reoffence)
+results_step2.reoffence <- run_my_bootstraps(results_step2.reoffence, 10)
 save.image("~/Dropbox/to aws/MI after 2b - reoffence.RData")
 rm(list = ls())
 
 load("~/Dropbox/to aws/MI after 2b - closed.RData")
 
-results_step2.closed <- run_my_bootstraps(results_step2.closed)
+results_step2.closed <- run_my_bootstraps(results_step2.closed, 10)
 save.image("~/Dropbox/to aws/MI after 2b - closed.RData")
 rm(list = ls())
   
