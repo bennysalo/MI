@@ -4,36 +4,56 @@
 
 n_samples <- 10
 
-RNGkind("L'Ecuyer-CMRG")
-saved_seed <- .Random.seed
+# RNGkind("L'Ecuyer-CMRG")
+# saved_seed <- .Random.seed
 
+rm(list = ls())
 
-### Add iseed argument
+load("~/Dropbox/to aws/MI after 2b - age.RData")
 
+run_my_bootstraps <- function(results_list, n_samples = 10) {
+  start_time <- Sys.time()
+  results_list[["bootstrapped coefs"]] <- 
+  bootstrapLavaan(results_list[["configural fit"]], 
+                  R = n_samples, type="ordinary", FUN = coef_diff, verbose = TRUE)
+  results_list[["bootstrap time"]]     <- round(Sys.time()-start_time, digits = 2)
+  return(results_list)
+  }
 
-print(Sys.time())
-start<-Sys.time()
-boot_drugs.age        <- bootstrapLavaan(results_step2.age[["configural fit"]], 
-                                         R = n_samples, type="ordinary", FUN = coef_diff)
-Sys.time()-start
+results_step2.age <- run_my_bootstraps(results_step2.age)
+save.image("~/Dropbox/to aws/MI after 2b - age.RData")
+rm(list = ls())
 
-boot_drugs.violence   <- bootstrapLavaan(results_step2.violence[["configural"]], 
-                                         R = n_samples, type="ordinary", FUN = coef_diff)
-boot_drugs.previous   <- bootstrapLavaan(results_step2.previous[["configural"]], 
-                                         R = n_samples, type="ordinary", FUN = coef_diff)
-boot_drugs.reoffence <- bootstrapLavaan(results_step2..reoffence[["configural"]], 
-                                         R = n_samples, type="ordinary", FUN = coef_diff)
-boot_drugs.closed     <- bootstrapLavaan(results_step2.closed[["configural"]], 
-                                         R = n_samples, type="ordinary", FUN = coef_diff)
-Sys.time()-start
+load("~/Dropbox/to aws/MI after 2b - violence.RData")
 
-save.image("C:/Users/benny_000/Dropbox/AAAKTUELLT/MI/MI in drug scale/december2016.RData")
+results_step2.violence <- run_my_bootstraps(results_step2.violence)
+save.image("~/Dropbox/to aws/MI after 2b - violence.RData")
+rm(list = ls())
 
+load("~/Dropbox/to aws/MI after 2b - previous.RData")
+
+results_step2.previous <- run_my_bootstraps(results_step2.previous)
+save.image("~/Dropbox/to aws/MI after 2b - previous.RData")
+rm(list = ls())
+
+load("~/Dropbox/to aws/MI after 2b - reoffence.RData")
+
+results_step2.reoffence <- run_my_bootstraps(results_step2.reoffence)
+save.image("~/Dropbox/to aws/MI after 2b - reoffence.RData")
+rm(list = ls())
+
+load("~/Dropbox/to aws/MI after 2b - closed.RData")
+
+results_step2.closed <- run_my_bootstraps(results_step2.closed)
+save.image("~/Dropbox/to aws/MI after 2b - closed.RData")
+rm(list = ls())
+  
+  
 
 
 # Grab the standardised differences from the original data
 std.diff_and_CIs.age        <- create_sdiff_CI_df(results_step2.age[["configural fit"]],     
-                                                  boot_drugs.age)
+                                                  results_step2.age[["bootstrapped coefs"]])
 std.diff_and_CIs.violence   <- create_sdiff_CI_df(results_step2.violence[["configural fit"]],
                                                   boot_drugs.violence)
 std.diff_and_CIs.previous   <- create_sdiff_CI_df(results_step2.previous[["configural fit"]],
