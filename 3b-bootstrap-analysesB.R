@@ -1,10 +1,12 @@
 
 # 'Run bootstraps for configural model
-saved_seed <- .Random.seed
+
 
 n_samples <- 10
 
 RNGkind("L'Ecuyer-CMRG")
+saved_seed <- .Random.seed
+
 
 ### Add iseed argument
 
@@ -13,17 +15,15 @@ print(Sys.time())
 start<-Sys.time()
 boot_drugs.age        <- bootstrapLavaan(results_step2.age[["configural fit"]], 
                                          R = n_samples, type="ordinary", FUN = coef_diff)
+Sys.time()-start
 
-#### edited up to here
-
-
-boot_drugs.violence   <- bootstrapLavaan(three_fits.violence[["configural"]], 
+boot_drugs.violence   <- bootstrapLavaan(results_step2.violence[["configural"]], 
                                          R = n_samples, type="ordinary", FUN = coef_diff)
-boot_drugs.previous   <- bootstrapLavaan(three_fits.previous[["configural"]], 
+boot_drugs.previous   <- bootstrapLavaan(results_step2.previous[["configural"]], 
                                          R = n_samples, type="ordinary", FUN = coef_diff)
-boot_drugs.reoffence <- bootstrapLavaan(three_fits.reoffence[["configural"]], 
+boot_drugs.reoffence <- bootstrapLavaan(results_step2..reoffence[["configural"]], 
                                          R = n_samples, type="ordinary", FUN = coef_diff)
-boot_drugs.closed     <- bootstrapLavaan(three_fits.closed[["configural"]], 
+boot_drugs.closed     <- bootstrapLavaan(results_step2.closed[["configural"]], 
                                          R = n_samples, type="ordinary", FUN = coef_diff)
 Sys.time()-start
 
@@ -32,15 +32,15 @@ save.image("C:/Users/benny_000/Dropbox/AAAKTUELLT/MI/MI in drug scale/december20
 
 
 # Grab the standardised differences from the original data
-std.diff_and_CIs.age        <- create_sdiff_CI_df(three_fits.age[["configural"]],     
+std.diff_and_CIs.age        <- create_sdiff_CI_df(results_step2.age[["configural fit"]],     
                                                   boot_drugs.age)
-std.diff_and_CIs.violence   <- create_sdiff_CI_df(three_fits.violence[["configural"]],
+std.diff_and_CIs.violence   <- create_sdiff_CI_df(results_step2.violence[["configural fit"]],
                                                   boot_drugs.violence)
-std.diff_and_CIs.previous   <- create_sdiff_CI_df(three_fits.previous[["configural"]],
+std.diff_and_CIs.previous   <- create_sdiff_CI_df(results_step2.previous[["configural fit"]],
                                                   boot_drugs.previous)
-std.diff_and_CIs.reoffence  <- create_sdiff_CI_df(three_fits.reoffence[["configural"]], 
+std.diff_and_CIs.reoffence  <- create_sdiff_CI_df(results_step2.reoffence[["configural fit"]], 
                                                   boot_drugs.reoffence)
-std.diff_and_CIs.closed     <- create_sdiff_CI_df(three_fits.closed[["configural"]],
+std.diff_and_CIs.closed     <- create_sdiff_CI_df(results_step2.closed[["configural fit"]],
                                                   boot_drugs.closed)
 
 ## Prepare a data.frame for plotting
