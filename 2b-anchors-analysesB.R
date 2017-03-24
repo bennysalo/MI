@@ -3,12 +3,13 @@
 
 # create a vector of item names for items that only load on one factor
 unidim_items <- subset(lavaanify(Mod6facMI), op == "=~")$rhs
+# Pick items that only occur once in the parameter table
 unidim_items <- names(table(unidim_items))[table(unidim_items) == 1]
-#   # exclude "i_remedialTeaching" with only 1 threshold
-# unidim_items <- unidim_items[unidim_items != "i_remedialTeaching"]
 
 model_for_all <- Mod6facMI
 data_for_all <- FinPrisonMales2
+
+save.image("~/Dropbox/to aws/MI workspace after 1a.RData")
 
 
 
@@ -23,7 +24,8 @@ results_step2.age <- analyses_step_2(base_model = model_for_all,
 Sys.time()-start
 
 save.image("~/Dropbox/to aws/MI after 2b - age.RData")
-# Load earlier workspace to free up memory
+# Empty worskpace and load earlier workspace to free up memory
+rm(list = ls())
 load("~/Dropbox/to aws/MI workspace after 1a.RData")
 
 # ### VIOLENCE
@@ -37,7 +39,8 @@ results_step2.violence <- analyses_step_2(base_model = model_for_all,
 Sys.time()-start
 
 save.image("~/Dropbox/to aws/MI after 2b - violence.RData")
-# Load earlier workspace to free up memory
+# Empty worskpace and load earlier workspace to free up memory
+rm(list = ls())
 load("~/Dropbox/to aws/MI workspace after 1a.RData")
 
 # ### PREVIOUS
@@ -52,7 +55,8 @@ results_step2.previous <- analyses_step_2(base_model = model_for_all,
 Sys.time()-start
 
 save.image("~/Dropbox/to aws/MI after 2b - previous.RData")
-# Load earlier workspace to free up memory
+# Empty worskpace and load earlier workspace to free up memory
+rm(list = ls())
 load("~/Dropbox/to aws/MI workspace after 1a.RData")
 
 
@@ -68,7 +72,8 @@ results_step2.reoffender <- analyses_step_2(base_model = model_for_all,
 Sys.time()-start
 
 save.image("~/Dropbox/to aws/MI after 2b - reoffence.RData")
-# Load earlier workspace to free up memory
+# Empty worskpace and load earlier workspace to free up memory
+rm(list = ls())
 load("~/Dropbox/to aws/MI workspace after 1a.RData")
 
 # ### CLOSED
@@ -82,6 +87,7 @@ results_step2.closed <- analyses_step_2(base_model = model_for_all,
 Sys.time()-start
 
 save.image("~/Dropbox/to aws/MI after 2b - closed.RData")
-# Load earlier workspace to free up memory
+# Empty worskpace and load earlier workspace to free up memory
+rm(list = ls())
 load("~/Dropbox/to aws/MI workspace after 1a.RData")
 
