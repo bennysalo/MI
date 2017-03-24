@@ -6,6 +6,7 @@
 
 rm(list = ls())
 
+
 load("~/Dropbox/to aws/MI after 2b - age.RData")
 load("~/Dropbox/to aws/bootstrap functions.RData")
 
