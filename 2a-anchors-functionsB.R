@@ -221,7 +221,7 @@ analyses_step_2 <- function(base_model, used_data, grouping, item_vector) {
   #   ... would also show as low chisq.diff when compared to strong model
   # hence that is the best referent item
   # This in turn also means small difference in chisq between partial and strong invariance models
-  results[["partial invariance table"]] <- compare_partials_to_strong(partial_models_list = results[["partial_fits"]], 
+  results[["partial invariance table"]] <- compare_partials_to_strong(partial_models_list = results[["partial fits"]], 
                                                                       strong_model = results[["strong fit"]])
   # 4. Assign referent items
   results[["referent items"]] <- get_referent_items(fit_table = results[["partial invariance table"]])
