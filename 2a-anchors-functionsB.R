@@ -122,10 +122,11 @@ compare_partials_to_strong <- function(partial_models_list, strong_model) {
     
     out <- data.frame("Chisq"   = LRTstats$Chisq[1],
                       "Df"               = LRTstats$Df[1],
-                      "Chisq diff"       = LRTstats$`Chisq diff`[2],
-                      "Df diff"          = LRTstats$`Df diff`[2],
+                      "Chisq_diff"       = LRTstats$`Chisq diff`[2],
+                      "Df_diff"          = LRTstats$`Df diff`[2],
                       "p-value"          = LRTstats$`Pr(>Chisq)`[2],
                       "unscaled.chidiff" = lavInspect(strong, "fit")[3]-lavInspect(partial, "fit")[3])
+    out$LR_by_f                          <- out$unscaled.chidiff/ out$Df_diff           
     return(out)
   }
   
@@ -146,7 +147,7 @@ compare_partials_to_strong <- function(partial_models_list, strong_model) {
   test_results$factor <- pv[test_results$item]
   
   # Sort according to unscaled chi difference
-  return(test_results[order(test_results$unscaled.chidiff), ])
+  return(test_results[order(test_results$LR_by_f), ])
 }
 
 # Function for creating a vector of referent items from a table of the partial invariance test results
@@ -154,7 +155,7 @@ get_referent_items <- function(fit_table) {
   require(dplyr)
   
   table <- group_by(fit_table, factor) %>%
-    filter(Chisq == max(Chisq))
+    filter(LR_by_f == min(LR_by_f))
   
   return(table$item)
 }
@@ -235,7 +236,8 @@ analyses_step_2 <- function(base_model, used_data, grouping, item_vector) {
     run_configural_model(base_model, used_data, grouping, results[["referent items"]])
   # 7. TEst invariance by comparing configural and strong invariance models
   results[["test strong invariance"]]           <-
-    lavTestLRT(results[["configural fit"]], results[["strong fit"]], method = "satorra.bentler.2010") 
+    lavTestLRT(results[["configural fit"]], results[["strong fit"]], method = "satorra.bentler.2010")
+  results[["warnings"]]                         <- warnings()
   return(results)
 }
 
