@@ -24,14 +24,14 @@ rm(list = ls())
 load("~/Dropbox/to aws/MI after 2b - previous.RData")
 load("~/Dropbox/to aws/bootstrap functions.RData")
 
-results_step2.previous <- run_my_bootstraps(results_step2.previous)
+results_step2.previous <- run_my_bootstraps(results_step2.previous, n_samples = n)
 save.image("~/Dropbox/to aws/MI after 2b - previous.RData")
 rm(list = ls())
 
 load("~/Dropbox/to aws/MI after 2b - reoffence.RData")
 load("~/Dropbox/to aws/bootstrap functions.RData")
 
-results_step2.reoffence <- run_my_bootstraps(results_step2.reoffence, n_samples = n)
+results_step2.reoffender <- run_my_bootstraps(results_step2.reoffence, n_samples = n)
 save.image("~/Dropbox/to aws/MI after 2b - reoffence.RData")
 rm(list = ls())
 
