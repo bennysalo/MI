@@ -48,6 +48,9 @@ Sys.time()-start
 # Define the simulation with its arguments as far as it is repeated
   # previousSim allows previous simulation runs to be added to the current one
   #  (useful for breaking up the iterations in steps)
+  options('simsem.multicore' = FALSE)
+  
+  
 common_simulation <- function(rawData, previousSim = NULL) {
   fits <- simsem::sim(model = impact_model,
               rawData = rawData,
