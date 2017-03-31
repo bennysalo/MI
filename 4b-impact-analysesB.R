@@ -88,7 +88,7 @@ Sys.time()-start
 # pick out the standardized path coefficients 
 # and the difference between invariant and biased datasets
 
-summary(invariant_data.age[[1]]$group)
+summary(invariant_data.age[[1]])$group)
 round(get_path_difference(invariant_fits.age, biased_fits.age), digit = 3)
 
 summary(invariant_data.violence[[1]]$group)

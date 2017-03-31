@@ -1,3 +1,18 @@
+# Define a model with the drug factor regressed on group
+
+get_impact_model <- function(base_model) {
+  pt <- lavaanify(results_step2.age[["base model"]])
+  # Identify factors
+  factors          <- subset(pt, op == "=~")
+  factors          <- unique(factors$lhs)
+  # Define regression paths
+  reg_paths      <- paste(factors, '~ group \n', collapse = " ")
+  # Define model
+  impact_model <-  paste(results_step2.age[["base model"]], '\n', reg_paths)
+}
+
+
+
 
 
 
@@ -164,14 +179,18 @@ create_biased_data <- function(results_list, n_sets) {
 # sim.biased = SimResult from runs on biased data
 
 
-get_path_difference <- function (sim.invariant, sim.biased) {
-  # pick stanardized coefficients of the parameter "DrugL~group"
-  std_coeff.inv  <- inspect(sim.invariant, what = "std")$"DrugL~group"
-  std_coeff.bias <- inspect(sim.biased,    what = "std")$"DrugL~group"
+get_path_difference <- function (reg_coef, sim.invariant, sim.biased) {
+  
+  
+  # pick stanardized coefficients of the parameter defined by 'reg_coef'
+  std_coeff.inv  <- sim.invariant@stdCoef[, reg_coef]
+  
+  std_coeff.bias <- sim.biased@stdCoef[, reg_coef]
   # calculate Fisher's Z
   Fz.inv  <- atanh(std_coeff.inv)
   Fz.bias <- atanh(std_coeff.bias)
-  # Calculate mean, difference in means
+  
+  # Calculate mean, difference in means (using Fisher's Z)
   n.inv   <- length(std_coeff.inv )
   m.inv   <- mean(Fz.inv)
   sd.inv  <- sd(Fz.inv)
@@ -185,6 +204,7 @@ get_path_difference <- function (sim.invariant, sim.biased) {
   diff    <- mean(Fz.inv - Fz.bias)
   sd.diff <- sd(Fz.inv - Fz.bias)
   se.diff <- sd(Fz.inv - Fz.bias)/sqrt(length(Fz.bias))
+  
   # Create vector and convert back to standardized coefficient
   out <- c(m.inv, m.bias , diff , 
            sd.inv, sd.bias, sd.diff, 
@@ -196,3 +216,36 @@ get_path_difference <- function (sim.invariant, sim.biased) {
   colnames(out) <- c("Mean", "sd", "se", "n of repl")
   return(out)
 }
+
+get_all_path_differences <- function(sim.invariant, sim.biased, impact_model) {
+  require(purrr)
+  pt <- lavaanify(impact_model)
+  # Identify regressions
+  regressions      <- subset(pt, op == "~")
+  regressions      <- paste(regressions$lhs, regressions$op, regressions$rhs)
+  # get rid of spaces
+  regressions      <- gsub(pattern = " ", replacement = "", x = regressions)
+  
+  results <- map(.x = regressions, .f = get_path_difference, 
+                 sim.invariant = sim.invariant, sim.biased = sim.biased)
+  names(results) <- regressions
+  return(results)
+}
+
+all_impact_analyses <- function(base_model, used_data) {
+  results <- list() 
+  results[["base model"]]     <- base_model
+  results[["impact model"]]   <- get_impact_model(results("base model"))
+  results[["configural fit"]] <- cfa
+  results[["strong fit"]]     <-
+  results[["invariant data"]] <- 
+  results[["biased data"]]
+  results[["invariant fits"]]
+  results[["biased fits"]]
+  results[["path differences"]]
+  return(results)
+}
+
+
+
+
