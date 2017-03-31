@@ -3,7 +3,7 @@
 
 # Function for replacing the 'ustart' values in a parameter table 
 # with the fitted coefficents from another parameter table
-# Returns a paramter table that can be used in with 'lavaan:simulateData' 
+# Returns a paramter table that can be used with 'lavaan:simulateData' 
 # (as in function 'create_data_list' below)
 
 replace_coefs_in_pt <- function(pt.frame, pt.replacement) {
@@ -59,7 +59,7 @@ create_data_list<- function (pt1, pt2, n1, n2, n_sets, label1 = 1, label2 = 2) {
     simulated_data.group2 <- simulateData(pt2, sample.nobs = n2)
     simulated_data        <- rbind(simulated_data.group1, simulated_data.group2)
     
-    # Add column with group belonging - if labels are defined, use those
+    # Add column with group membership - if labels are defined, use those
     simulated_data        <- data.frame(simulated_data, 
                                         group = rep(c(label1, label2), times = c(n1, n2)))
     # Make all variables ordered
@@ -78,11 +78,15 @@ create_data_list<- function (pt1, pt2, n1, n2, n_sets, label1 = 1, label2 = 2) {
 # pt_list = List of parameter tables produced by 'grab_parameter_tables'
 # n_sets = number of data sets to produce (passed to 'create_data_list')
 
-create_invariant_data <- function(list_of_fits, n_sets) {
+create_invariant_data <- function(results_list, n_sets) {
   
   
-  pt.single     <- parameterTable(list_of_fits[["single_group"]])
-  pt.strong     <- parameterTable(list_of_fits[["strong"]])
+  pt.single     <- parameterTable(cfa(model     = results_list[["base model"]], 
+                                      data      = FinPrisonMales2, 
+                                      std.lv    = TRUE, 
+                                      estimator = "WLSMV",
+                                      do.fit    = FALSE))
+  pt.strong     <- parameterTable(results_list[["strong fit"]])
   
   # Create parameter tables for the two groups
   # Use single group model as frame and use parameter values from strong model
@@ -91,12 +95,12 @@ create_invariant_data <- function(list_of_fits, n_sets) {
   pt.invariant2 <- replace_coefs_in_pt(pt.single, pt.strong[pt.strong$group == 2, ])
   
   # Grab group sizes for the two groups
-  n1            <- lavInspect(list_of_fits[["strong"]], what = "nobs")[1]
-  n2            <- lavInspect(list_of_fits[["strong"]], what = "nobs")[2]
+  n1            <- lavInspect(results_list[["strong fit"]], what = "nobs")[1]
+  n2            <- lavInspect(results_list[["strong fit"]], what = "nobs")[2]
   
   # Add label for group labels
-  label1        <- lavInspect(list_of_fits[["strong"]], what = "group.label")[1]
-  label2        <- lavInspect(list_of_fits[["strong"]], what = "group.label")[2]
+  label1        <- lavInspect(results_list[["strong fit"]], what = "group.label")[1]
+  label2        <- lavInspect(results_list[["strong fit"]], what = "group.label")[2]
   
   # Use 'create_data_list' to simulate datasets
   invariant_data <- create_data_list(pt.invariant1, pt.invariant2, 
@@ -109,12 +113,16 @@ create_invariant_data <- function(list_of_fits, n_sets) {
 # Takes arguments:
 # drug.model.list = List of three fitted models produced by 'run.3.drugmodels'
 # n.sets = number of data sets to produce (passed to 'create_data_list'
-create_biased_data <- function(list_of_fits, n_sets) {
+create_biased_data <- function(results_list, n_sets) {
   
   # Grab parameter tables from the three fitted models
-  pt.single     <- parameterTable(list_of_fits[["single_group"]])
-  pt.configural <- parameterTable(list_of_fits[["configural"]])
-  pt.strong     <- parameterTable(list_of_fits[["strong"]])
+  pt.single     <- parameterTable(cfa(model     = results_list[["base model"]], 
+                                      data      = FinPrisonMales2, 
+                                      std.lv    = TRUE, 
+                                      estimator = "WLSMV",
+                                      do.fit    = FALSE))
+  pt.configural <- parameterTable(results_list[["configural fit"]])
+  pt.strong     <- parameterTable(results_list[["strong fit"]])
   
   # Identify factors
   factors          <- subset(pt.single, op == "=~")
@@ -137,12 +145,12 @@ create_biased_data <- function(list_of_fits, n_sets) {
   }
   
   # Grab group sizes for the two groups
-  n1            <- lavInspect(list_of_fits[["strong"]], what = "nobs")[1]
-  n2            <- lavInspect(list_of_fits[["strong"]], what = "nobs")[2]
+  n1            <- lavInspect(results_list[["strong fit"]], what = "nobs")[1]
+  n2            <- lavInspect(results_list[["strong fit"]], what = "nobs")[2]
   
   # Add label for group labels
-  label1        <- lavInspect(list_of_fits[["strong"]], what = "group.label")[1]
-  label2        <- lavInspect(list_of_fits[["strong"]], what = "group.label")[2]
+  label1        <- lavInspect(results_list[["strong fit"]], what = "group.label")[1]
+  label2        <- lavInspect(results_list[["strong fit"]], what = "group.label")[2]
   
   # Simulate biased data using parameter tables
   biased_data <- create_data_list(pt.biased1, pt.biased2, 

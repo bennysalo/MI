@@ -6,10 +6,11 @@ print(Sys.time())
 start<-Sys.time()
 
 # Create invariant and biased datasets based on the models above
-iters <- 1000
+iters <- 10
 
-invariant_data.age       <- create_invariant_data(three_fits.age, iters)
-biased_data.age          <- create_biased_data(three_fits.age, iters)
+results_step2.age[["base model"]] <- Mod6facMI
+invariant_data.age       <- create_invariant_data(results_step2.age, iters)
+biased_data.age          <- create_biased_data(results_step2.age, iters)
 
 invariant_data.violence  <- create_invariant_data(three_fits.violence, iters)
 biased_data.violence     <- create_biased_data(three_fits.violence, iters)
@@ -25,7 +26,7 @@ biased_data.closed       <- create_biased_data(three_fits.closed, iters)
 
 Sys.time()-start
 
-save.image("C:/Users/benny_000/Dropbox/AAAKTUELLT/MI/MI in drug scale/december2016.RData")
+
 
 
 
@@ -33,8 +34,14 @@ save.image("C:/Users/benny_000/Dropbox/AAAKTUELLT/MI/MI in drug scale/december20
 
 # Define a model with the drug factor regressed on group
 
-drugCovariateMod <- paste(drugMod2b, '\n',
-                          'DrugL ~ group')
+  
+  pt <- lavaanify(results_step2.age[["base model"]])
+# Identify factors
+  factors          <- subset(pt, op == "=~")
+  factors          <- unique(factors$lhs)
+  covariances      <- paste(factors, '~ group \n', collapse = " ")
+  impact_model <-  paste(results_step2.age[["base model"]], '\n', covariances)
+
 
 # Run SEM model in the generated datasets
 
@@ -42,7 +49,7 @@ drugCovariateMod <- paste(drugMod2b, '\n',
   # previousSim allows previous simulation runs to be added to the current one
   #  (useful for breaking up the iterations in steps)
 common_simulation <- function(rawData, previousSim = NULL) {
-  fits <- simsem::sim(model = drugCovariateMod,
+  fits <- simsem::sim(model = impact_model,
               rawData = rawData,
               lavaanfun = "sem",
               std.lv = TRUE,
@@ -71,7 +78,7 @@ biased_fits.closed       <- common_simulation(rawData = biased_data.closed)
 
 Sys.time()-start
 
-save.image("C:/Users/benny_000/Dropbox/AAAKTUELLT/MI/MI in drug scale/december2016.RData")
+
 
 
 
