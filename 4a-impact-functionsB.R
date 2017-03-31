@@ -265,7 +265,7 @@ all_impact_analyses <- function(results, base_model, used_data, n_sets = 10) {
                                                 estimator = "WLSMV")
   results[["path differences"]] <- get_all_path_differences(sim.invariant = results[["invariant fits"]],
                                                             sim.biased    = results[["biased fits"]],
-                                                            impact_model  = results_list[["impact model"]])
+                                                            impact_model  = results[["impact model"]])
   return(results)
 }
 
