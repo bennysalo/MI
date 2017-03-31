@@ -223,12 +223,18 @@ get_all_path_differences <- function(sim.invariant, sim.biased, impact_model) {
   return(results)
 }
 
+
+add_info <- function(results, base_model, used_data) {
+results[["base model"]]   <- base_model # move to earlier step
+results[["data"]]         <- used_data  # move to earlier step
+return(results)
+}
+
+
 all_impact_analyses <- function(results, base_model, used_data, n_sets = 10) {
-  results[["base model"]]   <- base_model # move to earlier step
-  results[["data"]]         <- used_data  # move to earlier step
-  results[["impact model"]] <- get_impact_model(results("base model"))
+  results[["impact model"]] <- get_impact_model(results[["base model"]])
   # Set up single group fit. No need to run the analysis.
-  results[["single group"]] <- cfa(model = results_list[["base model"]], 
+  results[["single group"]] <- cfa(model = results[["base model"]], 
                                data      = FinPrisonMales2, 
                                std.lv    = TRUE, 
                                estimator = "WLSMV",
