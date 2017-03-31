@@ -1,10 +1,6 @@
 
 #### CHECK IMPACT OF MEASURED AMOUT OF BIAS ON SCALE LEVEL
 
-print(Sys.time())
-start<-Sys.time()
-
-# Create invariant and biased datasets based on the models above
 
 rm(list = ls())
 load("C:/Users/benny_000/Dropbox/to aws/MI after 2b - age.RData")
@@ -19,6 +15,75 @@ results_step2.age <- all_impact_analyses(results = results_step2.age,
                                          n_sets = 10)
 
 Sys.time()-start
+save.image("C:/Users/benny_000/Dropbox/to aws/MI after 2b - age.RData")
+
+
+
+rm(list = ls())
+load("C:/Users/benny_000/Dropbox/to aws/MI after 2b - previous.RData")
+load("C:/Users/benny_000/Dropbox/to aws/impact functions.RData")
+
+print(Sys.time())
+start<-Sys.time()
+results_step2.previous <- add_info(results = results_step2.previous, base_model = Mod6facMI, used_data = FinPrisonMales2)
+results_step2.previous <- all_impact_analyses(results = results_step2.previous, 
+                                         base_model = Mod6facMI, 
+                                         used_data = FinPrisonMales2,
+                                         n_sets = 10)
+
+Sys.time()-start
+
+# save.image("C:/Users/benny_000/Dropbox/to aws/MI after 2b - previous.RData")
+
+
+rm(list = ls())
+load("C:/Users/benny_000/Dropbox/to aws/MI after 2b - violence.RData")
+load("C:/Users/benny_000/Dropbox/to aws/impact functions.RData")
+
+print(Sys.time())
+start<-Sys.time()
+results_step2.violence <- add_info(results = results_step2.violence, base_model = Mod6facMI, used_data = FinPrisonMales2)
+results_step2.violence <- all_impact_analyses(results = results_step2.violence, 
+                                              base_model = Mod6facMI, 
+                                              used_data = FinPrisonMales2,
+                                              n_sets = 10)
+
+Sys.time()-start
+# save.image("C:/Users/benny_000/Dropbox/to aws/MI after 2b - violence.RData")
+
+
+rm(list = ls())
+load("C:/Users/benny_000/Dropbox/to aws/MI after 2b - reoffence.RData")
+load("C:/Users/benny_000/Dropbox/to aws/impact functions.RData")
+
+print(Sys.time())
+start<-Sys.time()
+results_step2.reoffender <- add_info(results = results_step2.reoffender, base_model = Mod6facMI, used_data = FinPrisonMales2)
+results_step2.reoffender <- all_impact_analyses(results = results_step2.reoffender, 
+                                              base_model = Mod6facMI, 
+                                              used_data = FinPrisonMales2,
+                                              n_sets = 10)
+
+Sys.time()-start
+# save.image("C:/Users/benny_000/Dropbox/to aws/MI after 2b - reoffence.RData")
+
+rm(list = ls())
+load("C:/Users/benny_000/Dropbox/to aws/MI after 2b - closed.RData")
+load("C:/Users/benny_000/Dropbox/to aws/impact functions.RData")
+
+print(Sys.time())
+start<-Sys.time()
+results_step2.closed <- add_info(results = results_step2.closed, base_model = Mod6facMI, used_data = FinPrisonMales2)
+results_step2.closed <- all_impact_analyses(results = results_step2.closed,
+                                                base_model = Mod6facMI, 
+                                                used_data = FinPrisonMales2,
+                                                n_sets = 10)
+
+Sys.time()-start
+# save.image("C:/Users/benny_000/Dropbox/to aws/MI after 2b - closed.RData")
+
+
+
 # 
 # 
 # 
