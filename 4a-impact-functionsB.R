@@ -1,6 +1,6 @@
 rm(list = ls())
-# Define a model with the drug factor regressed on group
 
+# Define a model with the drug factor regressed on group
 get_impact_model <- function(base_model) {
   pt <- lavaanify(results_step2.age[["base model"]])
   # Identify factors
@@ -13,14 +13,13 @@ get_impact_model <- function(base_model) {
 }
 
 
-
-
-
-
 # Function for replacing the 'ustart' values in a parameter table 
 # with the fitted coefficents from another parameter table
 # Returns a paramter table that can be used with 'lavaan:simulateData' 
-# (as in function 'create_data_list' below)
+# Setup for use in functions 'create_invariant_data' and 'create_biased_data'
+#c Takes arguments:
+# pt.frame = The paramenter table where a parameter should be replaced and then returned
+# pt.replacement = The parameter table from where the replacing parameter should be taken
 
 replace_coefs_in_pt <- function(pt.frame, pt.replacement) {
   # Ensure the same order of parameters in both paramter tables
@@ -49,6 +48,7 @@ replace_coefs_in_pt <- function(pt.frame, pt.replacement) {
 # pt.frame = The paramenter table where a parameter should be replaced and then returned
 # pt.replacement = The parameter table from where the replacing parameter should be taken
 # lhs, op and rhs = column names in parameter tables used to identify parameter
+# Setup for use in function 'create_biased_data'
 
 replace_1_coef_in_pt <- function (pt.frame, pt.replacement, lhs, op, rhs = "") {
   # locate row number for parameter (to be changed) in both tables, grab that index i
@@ -64,7 +64,9 @@ replace_1_coef_in_pt <- function (pt.frame, pt.replacement, lhs, op, rhs = "") {
 }
 
 
-# Create data list for use in simulations. Takes arguments: 
+# Create data list for use in simulations. 
+# Setup for use in functions 'create_invariant_data' and 'create_biased_data'
+# Takes arguments: 
 # parameter table 1 and 2, the group sizes, the number of datasets to produce, and
 # labels for the groups (defaults to 1 & 2)
 
@@ -90,16 +92,18 @@ create_data_list<- function (pt1, pt2, n1, n2, n_sets, label1 = 1, label2 = 2) {
 
 
 
-# Create parameter tables for simulation of invariant data. Takes aruguments:
-# pt_list = List of parameter tables produced by 'grab_parameter_tables'
-# n_sets = number of data sets to produce (passed to 'create_data_list')
-
+# Create simulated datasets based on parameters from strong invariance model.
+# Takes arguments;
+# single_group = a fitted single group model
+# strong_fit   = a fitted strong group model
+# n_sets       = number of datasets to create
 create_invariant_data <- function(single_group, strong_fit, n_sets) {
   pt.single     <- parameterTable(single_group)
   pt.strong     <- parameterTable(strong_fit)
   
   # Create parameter tables for the two groups
   # Use single group model as frame and use parameter values from strong model
+  # See function 'replace_coefs_in_pt' above
   pt.invariant1 <- replace_coefs_in_pt(pt.frame = pt.single, 
                                        pt.replacement = pt.strong[pt.strong$group == 1, ])
   pt.invariant2 <- replace_coefs_in_pt(pt.single, pt.strong[pt.strong$group == 2, ])
@@ -118,11 +122,12 @@ create_invariant_data <- function(single_group, strong_fit, n_sets) {
   return(invariant_data)
 }
 
-# Create parameter tables for simulation of invariant data. 
-# - replacing means (but not variances) with the same from strong invariance model
-# Takes arguments:
-# drug.model.list = List of three fitted models produced by 'run.3.drugmodels'
-# n.sets = number of data sets to produce (passed to 'create_data_list'
+# Create simulated datasets based on parameters from configural invariance model,
+# exept factor means taken from strong invariance model.
+# Takes arguments;
+# single_group = a fitted single group model
+# strong_fit   = a fitted strong group model
+# n_sets       = number of datasets to create
 create_biased_data <- function(single_group, strong_fit, configural_fit, n_sets) {
   
   # Grab parameter tables from the three fitted models
@@ -136,11 +141,13 @@ create_biased_data <- function(single_group, strong_fit, configural_fit, n_sets)
   
   # Create parameter tables for groups 1 and 2
   # with single group as frame and parameter values from configural model
+  # See function 'replace_coefs_in_pt' above
   pt.biased1    <- replace_coefs_in_pt(pt.single, pt.configural[pt.configural$group == 1, ])
   pt.biased2    <- replace_coefs_in_pt(pt.single, pt.configural[pt.configural$group == 2, ])
   
   # Replace means with those from strong model. This to make the mean difference comparable
   # with the invariant data
+  # See function 'replace_1_coef_in_pt' above
   for (i in 1:length(factors)) {
   pt.biased1    <- replace_1_coef_in_pt(pt.frame = pt.biased1, 
                                         pt.replacement = pt.strong[pt.strong$group == 1,], 
@@ -165,15 +172,14 @@ create_biased_data <- function(single_group, strong_fit, configural_fit, n_sets)
 }
 
 # Function for calculating difference in standardized coeffiecient
+# setup for use in function 'get_all_path_differences'
 # between invariant and biased datasets. Takes arguments:
+# reg.coef      = the regression coefficient to analyze
 # sim.invariant = SimResult from runs on invariant data
-# sim.biased = SimResult from runs on biased data
-
-
+# sim.biased    = SimResult from runs on biased data
 get_path_difference <- function (reg_coef, sim.invariant, sim.biased) {
   
-  
-  # pick stanardized coefficients of the parameter defined by 'reg_coef'
+  # pick standardized coefficients of the parameter defined by 'reg_coef'
   std_coeff.inv  <- sim.invariant@stdCoef[, reg_coef]
   
   std_coeff.bias <- sim.biased@stdCoef[, reg_coef]
@@ -224,13 +230,14 @@ get_all_path_differences <- function(sim.invariant, sim.biased, impact_model) {
 }
 
 
+# Function that will eventually be integrated to earlier step. Add info of base model and data to the list.
 add_info <- function(results, base_model, used_data) {
 results[["base model"]]   <- base_model # move to earlier step
 results[["data"]]         <- used_data  # move to earlier step
 return(results)
 }
 
-
+# Do all impact analyses
 all_impact_analyses <- function(results, base_model, used_data, n_sets = 10) {
   results[["impact model"]] <- get_impact_model(results[["base model"]])
   # Set up single group fit. No need to run the analysis.
