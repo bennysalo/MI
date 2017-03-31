@@ -93,15 +93,9 @@ create_data_list<- function (pt1, pt2, n1, n2, n_sets, label1 = 1, label2 = 2) {
 # pt_list = List of parameter tables produced by 'grab_parameter_tables'
 # n_sets = number of data sets to produce (passed to 'create_data_list')
 
-create_invariant_data <- function(results_list, n_sets) {
-  
-  
-  pt.single     <- parameterTable(cfa(model     = results_list[["base model"]], 
-                                      data      = FinPrisonMales2, 
-                                      std.lv    = TRUE, 
-                                      estimator = "WLSMV",
-                                      do.fit    = FALSE))
-  pt.strong     <- parameterTable(results_list[["strong fit"]])
+create_invariant_data <- function(single_group, strong_fit, n_sets) {
+  pt.single     <- parameterTable(single_group)
+  pt.strong     <- parameterTable(strong_fit)
   
   # Create parameter tables for the two groups
   # Use single group model as frame and use parameter values from strong model
@@ -110,12 +104,12 @@ create_invariant_data <- function(results_list, n_sets) {
   pt.invariant2 <- replace_coefs_in_pt(pt.single, pt.strong[pt.strong$group == 2, ])
   
   # Grab group sizes for the two groups
-  n1            <- lavInspect(results_list[["strong fit"]], what = "nobs")[1]
-  n2            <- lavInspect(results_list[["strong fit"]], what = "nobs")[2]
+  n1            <- lavInspect(strong_fit, what = "nobs")[1]
+  n2            <- lavInspect(strong_fit, what = "nobs")[2]
   
   # Add label for group labels
-  label1        <- lavInspect(results_list[["strong fit"]], what = "group.label")[1]
-  label2        <- lavInspect(results_list[["strong fit"]], what = "group.label")[2]
+  label1        <- lavInspect(strong_fit, what = "group.label")[1]
+  label2        <- lavInspect(strong_fit, what = "group.label")[2]
   
   # Use 'create_data_list' to simulate datasets
   invariant_data <- create_data_list(pt.invariant1, pt.invariant2, 
@@ -128,16 +122,12 @@ create_invariant_data <- function(results_list, n_sets) {
 # Takes arguments:
 # drug.model.list = List of three fitted models produced by 'run.3.drugmodels'
 # n.sets = number of data sets to produce (passed to 'create_data_list'
-create_biased_data <- function(results_list, n_sets) {
+create_biased_data <- function(single_group, strong_fit, configural_fit, n_sets) {
   
   # Grab parameter tables from the three fitted models
-  pt.single     <- parameterTable(cfa(model     = results_list[["base model"]], 
-                                      data      = FinPrisonMales2, 
-                                      std.lv    = TRUE, 
-                                      estimator = "WLSMV",
-                                      do.fit    = FALSE))
-  pt.configural <- parameterTable(results_list[["configural fit"]])
-  pt.strong     <- parameterTable(results_list[["strong fit"]])
+  pt.single     <- parameterTable(single_group)
+  pt.strong     <- parameterTable(strong_fit)
+  pt.configural <- parameterTable(configural_fit)
   
   # Identify factors
   factors          <- subset(pt.single, op == "=~")
@@ -160,12 +150,12 @@ create_biased_data <- function(results_list, n_sets) {
   }
   
   # Grab group sizes for the two groups
-  n1            <- lavInspect(results_list[["strong fit"]], what = "nobs")[1]
-  n2            <- lavInspect(results_list[["strong fit"]], what = "nobs")[2]
+  n1            <- lavInspect(strong_fit, what = "nobs")[1]
+  n2            <- lavInspect(strong_fit, what = "nobs")[2]
   
   # Add label for group labels
-  label1        <- lavInspect(results_list[["strong fit"]], what = "group.label")[1]
-  label2        <- lavInspect(results_list[["strong fit"]], what = "group.label")[2]
+  label1        <- lavInspect(strong_fit, what = "group.label")[1]
+  label2        <- lavInspect(strong_fit, what = "group.label")[2]
   
   # Simulate biased data using parameter tables
   biased_data <- create_data_list(pt.biased1, pt.biased2, 
@@ -232,17 +222,36 @@ get_all_path_differences <- function(sim.invariant, sim.biased, impact_model) {
   return(results)
 }
 
-all_impact_analyses <- function(base_model, used_data) {
-  results <- list() 
-  results[["base model"]]     <- base_model
-  results[["impact model"]]   <- get_impact_model(results("base model"))
-  results[["configural fit"]] <- cfa
-  results[["strong fit"]]     <-
-  results[["invariant data"]] <- 
-  results[["biased data"]]
-  results[["invariant fits"]]
-  results[["biased fits"]]
-  results[["path differences"]]
+all_impact_analyses <- function(results, base_model, used_data, n_sets = 10) {
+  results[["base model"]]   <- base_model # move to earlier step
+  results[["data"]]         <- used_data  # move to earlier step
+  results[["impact model"]] <- get_impact_model(results("base model"))
+  # Set up single group fit. No need to run the analysis.
+  results[["single group"]] <- cfa(model = results_list[["base model"]], 
+                               data      = FinPrisonMales2, 
+                               std.lv    = TRUE, 
+                               estimator = "WLSMV",
+                               do.fit    = FALSE)
+  results[["invariant data"]]    <- create_invariant_data(single_group = results[["single group"]],
+                                                          strong_fit   = results[["strong fit"]],
+                                                          n_sets       = n_sets)
+  results[["biased data"]]       <- create_biased_data(single_group   = results[["single group"]],
+                                                       strong_fit     = results[["strong fit"]],
+                                                       configural_fit = results[["configural fit"]],
+                                                       n_sets       = n_sets)
+  results[["invariant fits"]]    <- simsem::sim(model     = results[["impact model"]],
+                                                rawData   = results[["invariant data"]],
+                                                lavaanfun = "sem",
+                                                std.lv    = TRUE,
+                                                estimator = "WLSMV")
+  results[["biased fits"]]       <- simsem::sim(model     = results[["impact model"]],
+                                                rawData   = results[["biased data"]],
+                                                lavaanfun = "sem",
+                                                std.lv    = TRUE,
+                                                estimator = "WLSMV")
+  results[["path differences"]] <- get_all_path_differences(sim.invariant = results[["invariant fits"]],
+                                                            sim.biased    = results[["biased fits"]],
+                                                            impact_model  = results_list[["impact model"]])
   return(results)
 }
 
