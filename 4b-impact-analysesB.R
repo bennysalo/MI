@@ -14,7 +14,7 @@ results_step2.age <- add_info(results = results_step2.age, base_model = Mod6facM
 results_step2.age <- all_impact_analyses(results = results_step2.age, 
                                          base_model = Mod6facMI, 
                                          used_data = FinPrisonMales2,
-                                         n_sets = 2)
+                                         n_sets = 1000)
 
 Sys.time()-start
 save.image("~/Dropbox/to aws/MI after 2b - age.RData")
@@ -31,7 +31,7 @@ results_step2.previous <- add_info(results = results_step2.previous, base_model 
 results_step2.previous <- all_impact_analyses(results = results_step2.previous, 
                                          base_model = Mod6facMI, 
                                          used_data = FinPrisonMales2,
-                                         n_sets = 2)
+                                         n_sets = 1000)
 
 Sys.time()-start
 
@@ -48,7 +48,7 @@ results_step2.violence <- add_info(results = results_step2.violence, base_model 
 results_step2.violence <- all_impact_analyses(results = results_step2.violence, 
                                               base_model = Mod6facMI, 
                                               used_data = FinPrisonMales2,
-                                              n_sets = 2)
+                                              n_sets = 1000)
 
 Sys.time()-start
 # save.image("~/Dropbox/to aws/MI after 2b - violence.RData")
@@ -64,7 +64,7 @@ results_step2.reoffender <- add_info(results = results_step2.reoffender, base_mo
 results_step2.reoffender <- all_impact_analyses(results = results_step2.reoffender, 
                                               base_model = Mod6facMI, 
                                               used_data = FinPrisonMales2,
-                                              n_sets = 2)
+                                              n_sets = 1000)
 
 Sys.time()-start
 # save.image("C:/Users/benny_000/Dropbox/to aws/MI after 2b - reoffence.RData")
@@ -79,7 +79,7 @@ results_step2.closed <- add_info(results = results_step2.closed, base_model = Mo
 results_step2.closed <- all_impact_analyses(results = results_step2.closed,
                                                 base_model = Mod6facMI, 
                                                 used_data = FinPrisonMales2,
-                                                n_sets = 2)
+                                                n_sets = 1000)
 
 Sys.time()-start
 # save.image("~/Dropbox/to aws/MI after 2b - closed.RData")
