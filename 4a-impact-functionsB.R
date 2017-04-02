@@ -2,14 +2,14 @@ rm(list = ls())
 
 # Define a model with the drug factor regressed on group
 get_impact_model <- function(base_model) {
-  pt <- lavaanify(results_step2.age[["base model"]])
+  pt <- lavaanify(base_model)
   # Identify factors
   factors          <- subset(pt, op == "=~")
   factors          <- unique(factors$lhs)
   # Define regression paths
   reg_paths      <- paste(factors, '~ group \n', collapse = " ")
   # Define model
-  impact_model <-  paste(results_step2.age[["base model"]], '\n', reg_paths)
+  impact_model <-  paste(base_model, '\n', reg_paths)
 }
 
 

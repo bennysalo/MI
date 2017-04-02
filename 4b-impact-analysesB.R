@@ -1,6 +1,8 @@
 
 #### CHECK IMPACT OF MEASURED AMOUT OF BIAS ON SCALE LEVEL
-
+require(lavaan)
+require(simsem)
+options('simsem.multicore' = FALSE)
 
 rm(list = ls())
 load("~/Dropbox/to aws/MI after 2b - age.RData")
