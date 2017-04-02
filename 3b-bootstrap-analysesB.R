@@ -31,7 +31,7 @@ rm(list = ls())
 load("~/Dropbox/to aws/MI after 2b - reoffence.RData")
 load("~/Dropbox/to aws/bootstrap functions.RData")
 
-results_step2.reoffender <- run_my_bootstraps(results_step2.reoffence, n_samples = n)
+results_step2.reoffender <- run_my_bootstraps(results_step2.reoffender, n_samples = n)
 save.image("~/Dropbox/to aws/MI after 2b - reoffence.RData")
 rm(list = ls())
 
