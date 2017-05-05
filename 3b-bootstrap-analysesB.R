@@ -49,13 +49,13 @@ rm(list = ls())
 std.diff_and_CIs.age        <- create_sdiff_CI_df(results_step2.age[["configural fit"]],     
                                                   results_step2.age[["bootstrapped coefs"]])
 std.diff_and_CIs.violence   <- create_sdiff_CI_df(results_step2.violence[["configural fit"]],
-                                                  boot_drugs.violence)
+                                                  results_step2.violence[["bootstrapped coefs"]])
 std.diff_and_CIs.previous   <- create_sdiff_CI_df(results_step2.previous[["configural fit"]],
-                                                  boot_drugs.previous)
-std.diff_and_CIs.reoffence  <- create_sdiff_CI_df(results_step2.reoffence[["configural fit"]], 
-                                                  boot_drugs.reoffence)
+                                                  results_step2.previous[["bootstrapped coefs"]])
+std.diff_and_CIs.reoffence  <- create_sdiff_CI_df(results_step2.reoffender[["configural fit"]], 
+                                                  results_step2.reoffender[["bootstrapped coefs"]])
 std.diff_and_CIs.closed     <- create_sdiff_CI_df(results_step2.closed[["configural fit"]],
-                                                  boot_drugs.closed)
+                                                  results_step2.closed[["bootstrapped coefs"]])
 
 ## Prepare a data.frame for plotting
 
@@ -65,7 +65,6 @@ std.diff_and_CIs.violence$grouping  <- "Violent crime"
 std.diff_and_CIs.previous$grouping  <- "Previous reoffence"
 std.diff_and_CIs.reoffence$grouping <- "Reoffence this time"
 std.diff_and_CIs.closed$grouping    <- "All of sentence in closed"
-
 
 
 # Combine all parameters to one data frame
@@ -97,7 +96,7 @@ std.diff_and_CIs.all_5$item <- sub(pattern = " ", replacement = "",
 std.diff_and_CIs.all_5$item <- sub(pattern = " .*$", replacement = "", 
                                    x = std.diff_and_CIs.all_5$item)
 
-# Create a column indicating which paramameter type is tested
+# Create a column indicating which parameter type is tested
 
 std.diff_and_CIs.all_5$parameter_type[grepl(pattern = "=~",
                                             rownames(std.diff_and_CIs.all_5))] <- "Loading"
@@ -106,10 +105,55 @@ std.diff_and_CIs.all_5$parameter_type[grepl(pattern = "t1",
 std.diff_and_CIs.all_5$parameter_type[grepl(pattern = "t2",
                                             rownames(std.diff_and_CIs.all_5))] <- "Threshold 2"
 
-# Create plot
+
+# Temporarily seperate loadings and thresholds
+
+std.diff_table.loadings <- std.diff_and_CIs.all_5[grep(pattern = "=~", x = rownames(std.diff_and_CIs.all_5)), ]
+std.diff_table.thresholds <- std.diff_and_CIs.all_5[grep(pattern = " \\| ", x = rownames(std.diff_and_CIs.all_5)), ]
+
+
+# Create a column with factors in std.diff_table.loadings
+
+std.diff_table.loadings$factor <- rownames(std.diff_table.loadings)
+std.diff_table.loadings$factor <- sub(pattern = " =~ .*$", replacement = "", x = std.diff_table.loadings$factor)
+
+# Create a column with factors in std.diff_table.threshold
+
+# Skapa tabell med items och factors som kan användas senare i figuren.
+# items_and_factors
+
+loadings_table <- subset(pt, op == "=~")
+items    <- unique(loadings_table$rhs)
+factors  <- unique(loadings_table$lhs)
+
+loadings <- paste(loadings_table$lhs, loadings_table$op, loadings_table$rhs)
+
+match_factor_items <- function(factor) {
+  factor_loadings <- loadings[grep(pattern = factor, x = loadings)]
+  factor_items    <- sub(pattern = "^.* =~ ", replacement = "", x = factor_loadings)
+  df              <- merge(factor, factor_items)
+  colnames(df)    <- c("factor", "item")
+  return(df)
+}
+
+
+
+library(dplyr)                  
+
+factors_and_items <- map_df(.x = factors, .f = match_factor_items)
+
+
+
+std.diff_table.thresholds <- merge(factors_and_items, std.diff_table.thresholds)
+
+rbind(std.diff_table.loadings, std.diff_table.thresholds)
+
+names(std.diff_table.loadings)
+names(std.diff_table.thresholds)
+
 #   The coordinates will be flipped
 
-p <- ggplot(data = std.diff_and_CIs.all_5, 
+p <- ggplot(data = std.diff_and_CIs.all_5[std.diff_and_CIs.all_5$grouping == "Younger", ], 
             # set aestetics
                 # Seperate rows for each parameter (at this stage x-axis)
             aes(x = item, 
