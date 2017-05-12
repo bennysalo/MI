@@ -87,9 +87,7 @@ std.diff_and_CIs.all_5$grouping <- factor(std.diff_and_CIs.all_5$grouping,
 
 std.diff_and_CIs.all_5$item <- rownames(std.diff_and_CIs.all_5)
 std.diff_and_CIs.all_5$item <- sub(pattern = "^.*=~", replacement = "", x = std.diff_and_CIs.all_5$item)
-std.diff_and_CIs.all_5$item <- sub(pattern = " \\| t1.*$", replacement = "", 
-                                   x = std.diff_and_CIs.all_5$item)
-std.diff_and_CIs.all_5$item <- sub(pattern = " \\| t2.*$", replacement = "", 
+std.diff_and_CIs.all_5$item <- sub(pattern = " \\| .*$", replacement = "", 
                                    x = std.diff_and_CIs.all_5$item)
 std.diff_and_CIs.all_5$item <- sub(pattern = " ", replacement = "", 
                                    x = std.diff_and_CIs.all_5$item)
@@ -113,43 +111,61 @@ std.diff_table.thresholds <- std.diff_and_CIs.all_5[grep(pattern = " \\| ", x = 
 
 
 # Create a column with factors in std.diff_table.loadings
-
+  # Simply pull the factors from the row names (loading strings)
 std.diff_table.loadings$factor <- rownames(std.diff_table.loadings)
 std.diff_table.loadings$factor <- sub(pattern = " =~ .*$", replacement = "", x = std.diff_table.loadings$factor)
 
 # Create a column with factors in std.diff_table.threshold
+  # More involved. Thesholds of an item can pertain to two factors. We here create a table where the thresholds appear for
+  # both factors.
 
-# Skapa tabell med items och factors som kan användas senare i figuren.
-# items_and_factors
+  # Grab parameter table
+  ptable <- lavaanify(results_step2.age$`base model`)
+  # Subset the loadings
+  loadings_table <- subset(ptable, op == "=~")
+  # Grab items and factors
+  items    <- unique(loadings_table$rhs)
+  factors  <- unique(loadings_table$lhs)
+  # Create a vector of the loadings
+  loadings <- paste(loadings_table$lhs, loadings_table$op, loadings_table$rhs)
 
-loadings_table <- subset(pt, op == "=~")
-items    <- unique(loadings_table$rhs)
-factors  <- unique(loadings_table$lhs)
+  # Use purrr:map to match each factor with all its items in a data.frame
+  
+  library(purrr)
 
-loadings <- paste(loadings_table$lhs, loadings_table$op, loadings_table$rhs)
-
-match_factor_items <- function(factor) {
-  factor_loadings <- loadings[grep(pattern = factor, x = loadings)]
-  factor_items    <- sub(pattern = "^.* =~ ", replacement = "", x = factor_loadings)
-  df              <- merge(factor, factor_items)
-  colnames(df)    <- c("factor", "item")
-  return(df)
+  # First create the function that will be used in purrr:map_df
+  match_factor_items <- function(factor) {
+    # Grab the loadings for the defined factor
+    factor_loadings <- loadings[grep(pattern = factor, x = loadings)]
+    # Isolate the item form that loading string
+    factor_items    <- sub(pattern = "^.* =~ ", replacement = "", x = factor_loadings)
+    # Put facots and loadings in a data frame
+    df              <- merge(factor, factor_items)
+    colnames(df)    <- c("factor", "item")
+    return(df)
 }
 
+  # Apply match_factor_items to all factors in the 'factors' vector. Result in a data.frame.
+  factors_and_items <- map_df(.x = factors, .f = match_factor_items)
+   
+  # Finally, merge data.frames, adding a column to with factos to 'std.diff.threshold'
+  # If there are two matching factors for an item in 'factor_and_items' the merge will result in two seperate rows
+  # (but with the same values)
+  # This table should have nrow = [number of loadings * 2 thresholds - 1 (that has only one threshold)] * 5 groupings
+  # = (44 * 2 - 1 )* 5 = 435
+  std.diff_table.thresholds <- merge(factors_and_items, std.diff_table.thresholds)
+  nrow(std.diff_table.thresholds) == (44 * 2 - 1 )* 5   # TRUE
 
-
-library(dplyr)                  
-
-factors_and_items <- map_df(.x = factors, .f = match_factor_items)
-
-
-
-std.diff_table.thresholds <- merge(factors_and_items, std.diff_table.thresholds)
-
+  
+# Combine loadings and thresholds back.
 rbind(std.diff_table.loadings, std.diff_table.thresholds)
 
-names(std.diff_table.loadings)
-names(std.diff_table.thresholds)
+
+# Find the loadings and thresholds furthest away from 0
+head(std.diff_table.loadings[order(abs(std.diff_table.loadings$std_diff), decreasing = TRUE),  ], 10)
+head(std.diff_table.thresholds[order(abs(std.diff_table.thresholds$std_diff), decreasing = TRUE),  ], 10)
+head(std.diff_and_CIs.violence[order(abs(std.diff_and_CIs.violence$std_diff), decreasing = TRUE),  ], 10)
+std.diff_and_CIs.violence
 
 #   The coordinates will be flipped
 
