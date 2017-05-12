@@ -164,8 +164,6 @@ rbind(std.diff_table.loadings, std.diff_table.thresholds)
 # Find the loadings and thresholds furthest away from 0
 head(std.diff_table.loadings[order(abs(std.diff_table.loadings$std_diff), decreasing = TRUE),  ], 10)
 head(std.diff_table.thresholds[order(abs(std.diff_table.thresholds$std_diff), decreasing = TRUE),  ], 10)
-head(std.diff_and_CIs.violence[order(abs(std.diff_and_CIs.violence$std_diff), decreasing = TRUE),  ], 10)
-std.diff_and_CIs.violence
 
 #   The coordinates will be flipped
 
