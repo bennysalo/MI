@@ -122,6 +122,6 @@ run_my_bootstraps <- function(results_list, n_samples = 10) {
 # Set number of bootstrap draws
 
 n <- 1000
-save.image("~/Dropbox/to aws/bootstrap functions.RData")
+# save.image("~/Dropbox/to aws/bootstrap functions.RData")
 
 

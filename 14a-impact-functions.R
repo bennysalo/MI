@@ -270,4 +270,5 @@ all_impact_analyses <- function(results, base_model, used_data, n_sets = 10) {
 }
 
 
-save.image("~/Dropbox/to aws/impact functions.RData")
+#save.image("~/Dropbox/to aws/impact functions.RData")
+
