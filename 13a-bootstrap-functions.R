@@ -2,7 +2,7 @@
 # The functions are simply saved in a workspace in the end of the script.
 # The workspace will contain the object 'n' that decides the number of bootstrap draws
 
-rm(list = ls())
+# rm(list = ls())
 
 # Function for calculating standardized loading and threshold differences from a configural model
 # To be used with 'bootstrapLavaan' to extract these parameters from every bootstrap,

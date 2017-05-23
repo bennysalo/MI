@@ -1,4 +1,4 @@
-rm(list = ls())
+# rm(list = ls())
 
 # Define a model with the drug factor regressed on group
 get_impact_model <- function(base_model) {
@@ -271,4 +271,4 @@ all_impact_analyses <- function(results, base_model, used_data, n_sets = 10) {
 
 
 #save.image("~/Dropbox/to aws/impact functions.RData")
-
+save.image("C:/Users/benny_000/Dropbox/to aws/MI-0-all functions and data.R.RData")
