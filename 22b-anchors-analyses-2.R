@@ -16,8 +16,6 @@ unidim_items <- names(table(unidim_items))[table(unidim_items) == 1]
 
 data_for_all <- FinPrisonMales2
 
-save.image("~/Dropbox/to aws/MI workspace after 1a.RData")
-
 
 
 # Median split on AGE
