@@ -1,7 +1,6 @@
 # Load workspace with functions
 
-load("C:/Users/benny_000/Dropbox/to aws/MI-0-all functions and data.R.RData")
-
+load("~/Dropbox/to aws/MI-0-all functions and data.R.RData")
 
 
 
