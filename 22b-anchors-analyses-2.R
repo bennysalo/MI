@@ -52,6 +52,21 @@ save.image("~/Dropbox/to aws/MI violence 2.RData")
 results.violence.2 <- run_my_bootstraps(results.violence.2, n_samples = n)
 save.image("~/Dropbox/to aws/MI violence 2.RData")
 
+
+load.image("~/Dropbox/to aws/MI violence 2.RData")
+print(Sys.time())
+start<-Sys.time()
+results.violence.2.4 <- add_info(results = results.violence.2, base_model = Mod6facMI, used_data = FinPrisonMales2)
+results.violence.2.4 <- all_impact_analyses(results = results.violence.2.4, 
+                                              base_model = Mod6facMI, 
+                                              used_data = FinPrisonMales2,
+                                              n_sets = 1000)
+
+Sys.time()-start
+
+save.image("~/Dropbox/to aws/MI violence 2-4.RData")
+
+
 # ### PREVIOUS
 
 print(Sys.time())
