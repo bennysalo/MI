@@ -16,6 +16,7 @@ unidim_items <- names(table(unidim_items))[table(unidim_items) == 1]
 
 data_for_all <- FinPrisonMales2
 
+n <- 1000
 
 
 # Median split on AGE
@@ -31,6 +32,11 @@ Sys.time()-start
 save.image("~/Dropbox/to aws/MI age 2.RData")
 
 
+results.age.2 <- run_my_bootstraps(results.age.2, n_samples = n)
+save.image("~/Dropbox/to aws/MI age 2.RData")
+rm(list = ls())
+
+
 # ### VIOLENCE
 print(Sys.time())
 start<-Sys.time()
@@ -43,6 +49,8 @@ Sys.time()-start
 
 save.image("~/Dropbox/to aws/MI violence 2.RData")
 
+results.violence.2 <- run_my_bootstraps(results.violence.2, n_samples = n)
+save.image("~/Dropbox/to aws/MI violence 2.RData")
 
 # ### PREVIOUS
 
@@ -55,6 +63,9 @@ results.previous.2 <- analyses_step_2(base_model = model_for_all,
 
 Sys.time()-start
 
+save.image("~/Dropbox/to aws/MI previous 2.RData")
+
+results.previous.2 <- run_my_bootstraps(results.previous.2, n_samples = n)
 save.image("~/Dropbox/to aws/MI previous 2.RData")
 
 
@@ -71,6 +82,11 @@ Sys.time()-start
 
 save.image("~/Dropbox/to aws/MI reoffence 2.RData")
 
+results.reoffence.2 <- run_my_bootstraps(results.reoffence.2, n_samples = n)
+save.image("~/Dropbox/to aws/MI reoffence 2.RData")
+rm(list = ls())
+
+
 
 # ### CLOSED
 print(Sys.time())
@@ -84,4 +100,6 @@ Sys.time()-start
 
 save.image("~/Dropbox/to aws/MI closed 2.RData")
 
+results.closed.2 <- run_my_bootstraps(results.closed.2, n_samples = n)
+save.image("~/Dropbox/to aws/MI closed 2.RData")
 
