@@ -33,8 +33,8 @@ save.image("~/Dropbox/to aws/MI age-4.RData")
 
 print(Sys.time())
 start<-Sys.time()
-results.violence.4 <- add_info(results = results.violence.4, base_model = model_for_all, used_data = FinPrisonMales2)
-results.violence.4 <- all_impact_analyses(results = results.violence.4, 
+results.age.4 <- add_info(results = results.age.4, base_model = model_for_all, used_data = FinPrisonMales2)
+results.age.4 <- all_impact_analyses(results = results.violence.4, 
                                           base_model = model_for_all, 
                                           used_data = FinPrisonMales2,
                                           n_sets = 1000)
@@ -86,8 +86,8 @@ save.image("~/Dropbox/to aws/MI previous-4.RData")
 
 print(Sys.time())
 start<-Sys.time()
-results.violence.4 <- add_info(results = results.violence.4, base_model = model_for_all, used_data = FinPrisonMales2)
-results.violence.4 <- all_impact_analyses(results = results.violence.4, 
+results.previous.4 <- add_info(results = results.previous.4, base_model = model_for_all, used_data = FinPrisonMales2)
+results.previous.4 <- all_impact_analyses(results = results.violence.4, 
                                           base_model = model_for_all, 
                                           used_data = FinPrisonMales2,
                                           n_sets = 1000)
@@ -111,8 +111,8 @@ Sys.time()-start
 save.image("~/Dropbox/to aws/MI reoffence-4.RData")
 print(Sys.time())
 start<-Sys.time()
-results.violence.4 <- add_info(results = results.violence.4, base_model = model_for_all, used_data = FinPrisonMales2)
-results.violence.4 <- all_impact_analyses(results = results.violence.4, 
+results.reoffence.4 <- add_info(results = results.reoffence.4, base_model = model_for_all, used_data = FinPrisonMales2)
+results.reoffence.4 <- all_impact_analyses(results = results.violence.4, 
                                           base_model = model_for_all, 
                                           used_data = FinPrisonMales2,
                                           n_sets = 1000)
@@ -137,8 +137,8 @@ Sys.time()-start
 save.image("~/Dropbox/to aws/MI closed-4.RData")
 print(Sys.time())
 start<-Sys.time()
-results.violence.4 <- add_info(results = results.violence.4, base_model = model_for_all, used_data = FinPrisonMales2)
-results.violence.4 <- all_impact_analyses(results = results.violence.4, 
+results.closed.4 <- add_info(results = results.closed.4, base_model = model_for_all, used_data = FinPrisonMales2)
+results.closed.4 <- all_impact_analyses(results = results.violence.4, 
                                           base_model = model_for_all, 
                                           used_data = FinPrisonMales2,
                                           n_sets = 1000)
