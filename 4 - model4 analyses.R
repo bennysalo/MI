@@ -22,99 +22,128 @@ n <- 1000
 # Median split on AGE
 print(Sys.time())
 start<-Sys.time()
-results.age.2 <- analyses_step_2(base_model = model_for_all, 
+results.age.4 <- analyses_step_2(base_model = model_for_all, 
                                  used_data  = data_for_all, 
                                  grouping   = "ageMedSplit", 
                                  item_vector = unidim_items)
 
 Sys.time()-start
 
-save.image("~/Dropbox/to aws/MI age 2.RData")
+save.image("~/Dropbox/to aws/MI age-4.RData")
+
+print(Sys.time())
+start<-Sys.time()
+results.violence.4 <- add_info(results = results.violence.4, base_model = model_for_all, used_data = FinPrisonMales2)
+results.violence.4 <- all_impact_analyses(results = results.violence.4, 
+                                          base_model = model_for_all, 
+                                          used_data = FinPrisonMales2,
+                                          n_sets = 1000)
+
+Sys.time()-start
 
 
-results.age.2 <- run_my_bootstraps(results.age.2, n_samples = n)
-save.image("~/Dropbox/to aws/MI age 2.RData")
-rm(list = ls())
+save.image("~/Dropbox/to aws/MI age-4.RData")
 
 
 # ### VIOLENCE
 print(Sys.time())
 start<-Sys.time()
-results.violence.2 <- analyses_step_2(base_model = model_for_all, 
+results.violence.4 <- analyses_step_2(base_model = model_for_all, 
                                       used_data  = data_for_all, 
                                       grouping   = "violentCrime", 
                                       item_vector = unidim_items)
 
 Sys.time()-start
 
-save.image("~/Dropbox/to aws/MI violence 2.RData")
-
-results.violence.2 <- run_my_bootstraps(results.violence.2, n_samples = n)
-save.image("~/Dropbox/to aws/MI violence 2.RData")
+save.image("~/Dropbox/to aws/MI violence-4.RData")
 
 
-load.image("~/Dropbox/to aws/MI violence 2.RData")
 print(Sys.time())
 start<-Sys.time()
-results.violence.2.4 <- add_info(results = results.violence.2, base_model = Mod6facMI, used_data = FinPrisonMales2)
-results.violence.2.4 <- all_impact_analyses(results = results.violence.2.4, 
-                                            base_model = Mod6facMI, 
+results.violence.4 <- add_info(results = results.violence.4, base_model = model_for_all, used_data = FinPrisonMales2)
+results.violence.4 <- all_impact_analyses(results = results.violence.4, 
+                                            base_model = model_for_all, 
                                             used_data = FinPrisonMales2,
                                             n_sets = 1000)
 
 Sys.time()-start
 
-save.image("~/Dropbox/to aws/MI violence 2-4.RData")
+save.image("~/Dropbox/to aws/MI violence-4.RData")
 
 
 # ### PREVIOUS
 
 print(Sys.time())
 start<-Sys.time()
-results.previous.2 <- analyses_step_2(base_model = model_for_all, 
+results.previous.4 <- analyses_step_2(base_model = model_for_all, 
                                       used_data  = data_for_all, 
                                       grouping   = "prevReoffence", 
                                       item_vector = unidim_items)
 
 Sys.time()-start
 
-save.image("~/Dropbox/to aws/MI previous 2.RData")
+save.image("~/Dropbox/to aws/MI previous-4.RData")
 
-results.previous.2 <- run_my_bootstraps(results.previous.2, n_samples = n)
-save.image("~/Dropbox/to aws/MI previous 2.RData")
+print(Sys.time())
+start<-Sys.time()
+results.violence.4 <- add_info(results = results.violence.4, base_model = model_for_all, used_data = FinPrisonMales2)
+results.violence.4 <- all_impact_analyses(results = results.violence.4, 
+                                          base_model = model_for_all, 
+                                          used_data = FinPrisonMales2,
+                                          n_sets = 1000)
+
+Sys.time()-start
+
+save.image("~/Dropbox/to aws/MI previous-4.RData")
 
 
 # ### REOFFENCE
 
 print(Sys.time())
 start<-Sys.time()
-results.reoffence.2 <- analyses_step_2(base_model = model_for_all, 
+results.reoffence.4 <- analyses_step_2(base_model = model_for_all, 
                                        used_data  = data_for_all, 
                                        grouping   = "reoffender", 
                                        item_vector = unidim_items)
 
 Sys.time()-start
 
-save.image("~/Dropbox/to aws/MI reoffence 2.RData")
+save.image("~/Dropbox/to aws/MI reoffence-4.RData")
+print(Sys.time())
+start<-Sys.time()
+results.violence.4 <- add_info(results = results.violence.4, base_model = model_for_all, used_data = FinPrisonMales2)
+results.violence.4 <- all_impact_analyses(results = results.violence.4, 
+                                          base_model = model_for_all, 
+                                          used_data = FinPrisonMales2,
+                                          n_sets = 1000)
 
-results.reoffence.2 <- run_my_bootstraps(results.reoffence.2, n_samples = n)
-save.image("~/Dropbox/to aws/MI reoffence 2.RData")
-rm(list = ls())
+Sys.time()-start
+
+
+save.image("~/Dropbox/to aws/MI reoffence-4.RData")
 
 
 
 # ### CLOSED
 print(Sys.time())
 start<-Sys.time()
-results.closed.2 <- analyses_step_2(base_model = model_for_all, 
+results.closed.4 <- analyses_step_2(base_model = model_for_all, 
                                     used_data  = data_for_all, 
                                     grouping   = "allClosed", 
                                     item_vector = unidim_items)
 
 Sys.time()-start
 
-save.image("~/Dropbox/to aws/MI closed 2.RData")
+save.image("~/Dropbox/to aws/MI closed-4.RData")
+print(Sys.time())
+start<-Sys.time()
+results.violence.4 <- add_info(results = results.violence.4, base_model = model_for_all, used_data = FinPrisonMales2)
+results.violence.4 <- all_impact_analyses(results = results.violence.4, 
+                                          base_model = model_for_all, 
+                                          used_data = FinPrisonMales2,
+                                          n_sets = 1000)
 
-results.closed.2 <- run_my_bootstraps(results.closed.2, n_samples = n)
-save.image("~/Dropbox/to aws/MI closed 2.RData")
+Sys.time()-start
+
+save.image("~/Dropbox/to aws/MI closed-4.RData")
 
