@@ -11,6 +11,8 @@ library(simsem)
 library(semTools)
 library(purrr)
 
+install.packages("dplyr")
+library(dplyr)
 
 
 # # Full setup
