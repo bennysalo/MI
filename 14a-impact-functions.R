@@ -230,42 +230,42 @@ get_all_path_differences <- function(sim.invariant, sim.biased, impact_model) {
 }
 
 
-# Function that will eventually be integrated to earlier step. Add info of base model and data to the list.
+# Function that will eventually be integrated to earlier step. Add info of base_model and data to the list.
 add_info <- function(results, base_model, used_data) {
-results[["base model"]]   <- base_model # move to earlier step
+results[["base_model"]]   <- base_model # move to earlier step
 results[["data"]]         <- used_data  # move to earlier step
 return(results)
 }
 
 # Do all impact analyses
 all_impact_analyses <- function(results, base_model, used_data, n_sets = 10) {
-  results[["impact model"]] <- get_impact_model(results[["base model"]])
+  results[["impact_model"]] <- get_impact_model(results[["base_model"]])
   # Set up single group fit. No need to run the analysis.
-  results[["single group"]] <- cfa(model = results[["base model"]], 
+  results[["single_group"]] <- cfa(model = results[["base_model"]], 
                                data      = FinPrisonMales2, 
                                std.lv    = TRUE, 
                                estimator = "WLSMV",
                                do.fit    = FALSE)
-  results[["invariant data"]]    <- create_invariant_data(single_group = results[["single group"]],
+  results[["invariant_data"]]    <- create_invariant_data(single_group = results[["single_group"]],
                                                           strong_fit   = results[["strong fit"]],
                                                           n_sets       = n_sets)
-  results[["biased data"]]       <- create_biased_data(single_group   = results[["single group"]],
+  results[["biased_data"]]       <- create_biased_data(single_group   = results[["single_group"]],
                                                        strong_fit     = results[["strong fit"]],
                                                        configural_fit = results[["configural fit"]],
                                                        n_sets       = n_sets)
-  results[["invariant fits"]]    <- simsem::sim(model     = results[["impact model"]],
-                                                rawData   = results[["invariant data"]],
+  results[["invariant_fits"]]    <- simsem::sim(model     = results[["impact_model"]],
+                                                rawData   = results[["invariant_data"]],
                                                 lavaanfun = "sem",
                                                 std.lv    = TRUE,
                                                 estimator = "WLSMV")
-  results[["biased fits"]]       <- simsem::sim(model     = results[["impact model"]],
-                                                rawData   = results[["biased data"]],
+  results[["biased_fits"]]       <- simsem::sim(model     = results[["impact_model"]],
+                                                rawData   = results[["biased_data"]],
                                                 lavaanfun = "sem",
                                                 std.lv    = TRUE,
                                                 estimator = "WLSMV")
-  results[["path differences"]] <- get_all_path_differences(sim.invariant = results[["invariant fits"]],
-                                                            sim.biased    = results[["biased fits"]],
-                                                            impact_model  = results[["impact model"]])
+  results[["path_differences"]] <- get_all_path_differences(sim.invariant = results[["invariant_fits"]],
+                                                            sim.biased    = results[["biased_fits"]],
+                                                            impact_model  = results[["impact_model"]])
   return(results)
 }
 
