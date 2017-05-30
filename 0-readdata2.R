@@ -1,12 +1,12 @@
-rm(list = ls())
+# rm(list = ls())
 
 library(foreign, pos=4)
 FinPrisonData <- read.spss("../Dropbox/to aws/data/recidivists and nonrecidivsts all cases.sav", 
                           use.value.labels=TRUE, max.value.labels=Inf, to.data.frame=TRUE)
 
 # From local machine
-# FinPrisonData <- read.spss("C:/Users/benny_000/Dropbox/to aws/data/recidivists and nonrecidivsts all cases.sav", 
-# use.value.labels=TRUE, max.value.labels=Inf, to.data.frame=TRUE)
+FinPrisonData <- read.spss("C:/Users/benny_000/Dropbox/to aws/data/recidivists and nonrecidivsts all cases.sav",
+use.value.labels=TRUE, max.value.labels=Inf, to.data.frame=TRUE)
 
 # set NA on i_partnerRelation and i_parenting as 0 = no problem
 FinPrisonData$i_partnerRelation <- ifelse(is.na(FinPrisonData$i_partnerRelation), 0, FinPrisonData$i_partnerRelation)
