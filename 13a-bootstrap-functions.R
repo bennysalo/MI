@@ -125,3 +125,22 @@ n <- 1000
 # save.image("~/Dropbox/to aws/bootstrap functions.RData")
 
 
+
+# Short version of create_sdiff_CI_df when there are bootstrapped values
+
+create_sdiff_df <- function(original_model) {
+  # Grab the standardized differences from the original fit using 'coeff_diff'
+  # Only grab the coefficients with the suffix ".std_diff"
+  standardized_differences <- coef_diff(original_model)
+  standardized_differences <- standardized_differences[grep(names(standardized_differences), 
+                                                            pattern = ".std_diff")]
+
+  # Create 'out' data.frame combining the standardized differences and their confidence interval 
+  out <- data.frame(round(standardized_differences, 3))
+  # Give this data frame adequate column names
+  colnames(out) <- c("std_diff")
+  out$names<- sub(pattern = ".std_diff", replacement = "", x = rownames(out))
+  out[order(abs(out$std_diff)),]
+}
+
+
