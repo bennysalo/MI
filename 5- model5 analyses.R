@@ -16,7 +16,7 @@ unidim_items <- names(table(unidim_items))[table(unidim_items) == 1]
 
 data_for_all <- FinPrisonMales2
 
-n <- 1000
+n <- 100
 
 
 # Median split on AGE
@@ -37,7 +37,7 @@ results.age.5 <- add_info(results = results.age.5, base_model = model_for_all, u
 results.age.5 <- all_impact_analyses(results = results.age.5, 
                                      base_model = model_for_all, 
                                      used_data = FinPrisonMales2,
-                                     n_sets = 1000)
+                                     n_sets = n)
 
 Sys.time()-start
 
@@ -64,7 +64,7 @@ results.violence.5 <- add_info(results = results.violence.5, base_model = model_
 results.violence.5 <- all_impact_analyses(results = results.violence.5, 
                                           base_model = model_for_all, 
                                           used_data = FinPrisonMales2,
-                                          n_sets = 1000)
+                                          n_sets = n)
 
 Sys.time()-start
 
@@ -90,7 +90,7 @@ results.previous.5 <- add_info(results = results.previous.5, base_model = model_
 results.previous.5 <- all_impact_analyses(results = results.previous.5, 
                                           base_model = model_for_all, 
                                           used_data = FinPrisonMales2,
-                                          n_sets = 1000)
+                                          n_sets = n)
 
 Sys.time()-start
 
@@ -115,7 +115,7 @@ results.reoffence.5 <- add_info(results = results.reoffence.5, base_model = mode
 results.reoffence.5 <- all_impact_analyses(results = results.reoffence.5, 
                                            base_model = model_for_all, 
                                            used_data = FinPrisonMales2,
-                                           n_sets = 1000)
+                                           n_sets = n)
 
 Sys.time()-start
 
@@ -141,7 +141,7 @@ results.closed.5 <- add_info(results = results.closed.5, base_model = model_for_
 results.closed.5 <- all_impact_analyses(results = results.closed.5, 
                                         base_model = model_for_all, 
                                         used_data = FinPrisonMales2,
-                                        n_sets = 1000)
+                                        n_sets = n)
 
 Sys.time()-start
 
