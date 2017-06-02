@@ -208,9 +208,9 @@ run_configural_model <- function(base_model, used_data, grouping, referent_items
 analyses_step_2 <- function(base_model, used_data, grouping, item_vector) {
   results <- list()
   # 1. Run partial models
-  results[["partial fits"]] <- run_all_partial_models(base_model, used_data, grouping, item_vector)
+  results[["partial_fits"]] <- run_all_partial_models(base_model, used_data, grouping, item_vector)
   # 2. Run strong invariance model
-  results[["strong fit"]]   <- run_strong_model(base_model, used_data, grouping)
+  results[["strong_fit"]]   <- run_strong_model(base_model, used_data, grouping)
   # 3. Order according to unscaled chi-square difference
   # Order partial fits according to how bad the fit is (higher chi-square)
   # (unscaled chis-square is used)
@@ -222,21 +222,21 @@ analyses_step_2 <- function(base_model, used_data, grouping, item_vector) {
   #   ... would also show as low chisq.diff when compared to strong model
   # hence that is the best referent item
   # This in turn also means small difference in chisq between partial and strong invariance models
-  results[["partial invariance table"]]         <- 
-    compare_partials_to_strong(partial_models_list = results[["partial fits"]], 
-                               strong_model = results[["strong fit"]])
+  results[["partial_invariance_table"]]         <- 
+    compare_partials_to_strong(partial_models_list = results[["partial_fits"]], 
+                               strong_model = results[["strong_fit"]])
   # 4. Assign referent items
-  results[["referent items"]]                   <- 
-    get_referent_items(fit_table = results[["partial invariance table"]])
+  results[["referent_items"]]                   <- 
+    get_referent_items(fit_table = results[["partial_invariance_table"]])
   # 5. Pick out the referent items to see if they meet LRT test for invariance
-  results[["significance test referent items"]] <- 
-    subset(results[["partial invariance table"]],item %in% results[["referent items"]])
+  results[["significance_test_referent_items"]] <- 
+    subset(results[["partial_invariance_table"]],item %in% results[["referent_items"]])
   # 6. Fit configural model
-  results[["configural fit"]]                   <- 
-    run_configural_model(base_model, used_data, grouping, results[["referent items"]])
+  results[["configural_fit"]]                   <- 
+    run_configural_model(base_model, used_data, grouping, results[["referent_items"]])
   # 7. TEst invariance by comparing configural and strong invariance models
-  results[["test strong invariance"]]           <-
-    lavTestLRT(results[["configural fit"]], results[["strong fit"]], method = "satorra.bentler.2010")
+  results[["test_strong_invariance"]]           <-
+    lavTestLRT(results[["configural_fit"]], results[["strong_fit"]], method = "satorra.bentler.2010")
   results[["warnings"]]                         <- warnings()
   return(results)
 }

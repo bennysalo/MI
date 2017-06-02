@@ -70,7 +70,7 @@ replace_1_coef_in_pt <- function (pt.frame, pt.replacement, lhs, op, rhs = "") {
 # parameter table 1 and 2, the group sizes, the number of datasets to produce, and
 # labels for the groups (defaults to 1 & 2)
 
-create_data_list<- function (pt1, pt2, n1, n2, n_sets, label1 = 1, label2 = 2) {
+create_data_list<- function (pt1, pt2, n1, n2, n_sets) {
   data_list <- list()
   for(i in 1:n_sets) {
     simulated_data.group1 <- simulateData(pt1, sample.nobs = n1)
@@ -79,7 +79,7 @@ create_data_list<- function (pt1, pt2, n1, n2, n_sets, label1 = 1, label2 = 2) {
     
     # Add column with group membership - if labels are defined, use those
     simulated_data        <- data.frame(simulated_data, 
-                                        group = rep(c(label1, label2), times = c(n1, n2)))
+                                        group = rep(c(1, 2), times = c(n1, n2)))
     # Make all variables ordered
     simulated_data[c(1:length(simulated_data))] <- 
       lapply(simulated_data[c(1:length(simulated_data))], ordered)
@@ -111,14 +111,10 @@ create_invariant_data <- function(single_group, strong_fit, n_sets) {
   # Grab group sizes for the two groups
   n1            <- lavInspect(strong_fit, what = "nobs")[1]
   n2            <- lavInspect(strong_fit, what = "nobs")[2]
-  
-  # Add label for group labels
-  label1        <- lavInspect(strong_fit, what = "group.label")[1]
-  label2        <- lavInspect(strong_fit, what = "group.label")[2]
-  
+
   # Use 'create_data_list' to simulate datasets
   invariant_data <- create_data_list(pt.invariant1, pt.invariant2, 
-                                     n1, n2, label1 = label1, label2 = label2, n_sets)
+                                     n1, n2, n_sets)
   return(invariant_data)
 }
 
@@ -161,13 +157,10 @@ create_biased_data <- function(single_group, strong_fit, configural_fit, n_sets)
   n1            <- lavInspect(strong_fit, what = "nobs")[1]
   n2            <- lavInspect(strong_fit, what = "nobs")[2]
   
-  # Add label for group labels
-  label1        <- lavInspect(strong_fit, what = "group.label")[1]
-  label2        <- lavInspect(strong_fit, what = "group.label")[2]
   
   # Simulate biased data using parameter tables
   biased_data <- create_data_list(pt.biased1, pt.biased2, 
-                                n1, n2, label1 = label1, label2 = label2, n_sets)
+                                n1, n2, n_sets)
   return(biased_data)
 }
 
@@ -247,11 +240,11 @@ all_impact_analyses <- function(results, base_model, used_data, n_sets = 10) {
                                estimator = "WLSMV",
                                do.fit    = FALSE)
   results[["invariant_data"]]    <- create_invariant_data(single_group = results[["single_group"]],
-                                                          strong_fit   = results[["strong fit"]],
+                                                          strong_fit   = results[["strong_fit"]],
                                                           n_sets       = n_sets)
   results[["biased_data"]]       <- create_biased_data(single_group   = results[["single_group"]],
-                                                       strong_fit     = results[["strong fit"]],
-                                                       configural_fit = results[["configural fit"]],
+                                                       strong_fit     = results[["strong_fit"]],
+                                                       configural_fit = results[["configural_fit"]],
                                                        n_sets       = n_sets)
   results[["invariant_fits"]]    <- simsem::sim(model     = results[["impact_model"]],
                                                 rawData   = results[["invariant_data"]],
@@ -263,6 +256,10 @@ all_impact_analyses <- function(results, base_model, used_data, n_sets = 10) {
                                                 lavaanfun = "sem",
                                                 std.lv    = TRUE,
                                                 estimator = "WLSMV")
+  results[["groups"]]           <-  paste("Group 1 is " ,
+                                          lavInspect(results$strong_fit, what = "group.label")[1],
+                                          " - Group 2 is", 
+                                          lavInspect(results$strong_fit, what = "group.label")[2])
   results[["path_differences"]] <- get_all_path_differences(sim.invariant = results[["invariant_fits"]],
                                                             sim.biased    = results[["biased_fits"]],
                                                             impact_model  = results[["impact_model"]])
