@@ -2,37 +2,50 @@ rm(list = ls())
 set.seed(2108)
 
 library(tidyverse)
+library(lavaan)
 
 # LOAD DATA
 
 FinPrisonMales2 <- readRDS("C:/Users/benny_000/Dropbox/AAAKTUELLT/MI/FinPrisonMales2.rds")
 
+
+# Predefine objects that will be used several times
+predefined_model    <- Mod6facMI
+predefined_data     <- FinPrisonMales2
+predefined_grouping <- "ageMedSplit"
+n_samples           <- 2
+
+predefined_factors  <- subset(lavaanify(predefined_model), op == "=~")
+predefined_factors  <- unique(predefined_factors$lhs)
+
+
+
 # IDENTIFY REFERENT ITEMS
 
 # create a vector of item names for items that only load on one factor
-unidim_items <- subset(lavaanify(Mod6facMI), op == "=~")$rhs
+unidim_items <- subset(lavaanify(predefined_model), op == "=~")$rhs
 # Pick items that only occur once in the parameter table
 unidim_items <- names(table(unidim_items))[table(unidim_items) == 1]
 
-model_for_all <- Mod6facMI
-data_for_all <- FinPrisonMales2
 
 # Run a set of preliminary analyses
 # Median split on AGE
 print(Sys.time())
 start<-Sys.time()
-mod1_prel_results <- analyses_step_2(base_model = model_for_all, 
-                                     used_data  = data_for_all, 
-                                     grouping   = "ageMedSplit", 
+mod1_prel_results <- analyses_step_2(base_model = predefined_model, 
+                                     used_data  = predefined_data, 
+                                     grouping   = predefined_grouping, 
                                      item_vector = unidim_items)
 
 Sys.time()-start
 
 summary(mod1_prel_results)
 
+
+
 # BOOTSTRAP SAMPLES  
 
-# Function for creating onw stratified bootstrap (maintaining group sizes)
+# Function for creating one stratified bootstrap (maintaining group sizes)
 create_one_bootstrap <- function (dataset, grouping_var) {
   require(dplyr)
   dataset %>%
@@ -43,73 +56,106 @@ create_one_bootstrap <- function (dataset, grouping_var) {
 }
 
   
-  tbl_of_b_samples <- map_df(FinPrisonMales2, rep.int, times = n_samples) %>% 
-    mutate(sample_nr = rep(1:n_samples, each = nrow(FinPrisonMales2))) %>% 
-    nest(- sample_nr) %>%
-    mutate(boots = map(.x = data, .f = ~ create_one_bootstrap(.x, grouping_var = "ageMedSplit"))) %>% 
-    select(- data) 
+  boots_samples <- 
+    # Create 'n_samples' copies of the original data i one big data.frame
+    map_df(predefined_data, rep.int, times = n_samples) %>% 
+    # Create index numers for each replication of the origianl data: sample_nr
+    mutate(sample_nr = rep(1:n_samples, each = nrow(predefined_data))) %>% 
+    # Nest based on sample_nr creating a tibble with 'n_samples' rows with original data.frame in each row.
+    nest  (-sample_nr) %>%
+    # Use the function 'create_one_bootstrap' to create a bootstrap sample for each row
+    mutate(boots = map(.x = data, 
+                       .f = ~ create_one_bootstrap(.x, grouping_var = predefined_grouping))) %>% 
+    # Remove the origial data
+    select(-data) 
   
  
 # FIT CONFIGURAL MODEL TO BOOTSTRAP SAMPLES AND RECORD PARAMETERS
   # Function for getting the parameter table from the results of fitting a configural invariance model
-  # Uses the function run_configural_model
-  get_parTable <- function(dataset, base_model, grouping_var, referent_items) {
+  # Argument 'orig_pt' is meant to take a parameter table 
+
+  get_parTable <- function(dataset, orig_pt, grouping_var = predefined_grouping) {
     require(lavaan)
-    fit <- run_configural_model(base_model = base_model, used_data = dataset, 
-                                grouping = grouping_var, referent_items = referent_items)
+    fit <- cfa(model = orig_pt, data = dataset, group = grouping_var, estimator = "WLSMV")
     parTable(fit)
   }  
-   
-  # Run configural invarrinace model and record the parameter table for each bootstrap sample
-  configural_pts <- lapply(tbl_of_b_samples$boots, get_parTable,
-                           # arguments passed to run_configural_
-                           base_model = Mod6facMI, 
-                           grouping_var = "ageMedSplit", 
-                           referent_items = mod1_prel_results$referent_items)
   
+  # Setup the paramter table that will be used as the model for the analyses
+  # Grab the parameter table from the configural fit in the preliminary analyses
+  orig_configural_pt <- parTable(mod1_prel_results$configural_fit)
+  # Replace start values with the estimated parameters in the original sample
+  orig_configural_pt$ustart <- orig_configural_pt$est
   
-  # Add parameter tables of configural fit to the tbl
+  # Run configural invariance model and record the parameter table for each bootstrap sample
+
+  configural_pts <- lapply(boots_samples$boots, get_parTable, orig_pt = orig_configural_pt)
+
+  # Add parameter tables of configural fits to the tibble
   
-  tbl_of_b_samples <- tbl_of_b_samples %>% 
+  boots_samples <- boots_samples %>% 
     mutate(pt_configural = configural_pts)
   
   # Remove the now duplicate results from the environment
   rm(configural_pts)
   
 # CREATE PARAMETER TABLES THAT CAN BE USED FOR SIMULATION
-  
 
+  # Split pt_configural into seperate tables for the two groups: 'pt_boot_1' and 'pt_boot_2'
+  boots_samples <- boots_samples %>% 
+    mutate(pt_boot_g1 = map(.x = pt_configural, ~filter(.x, group == 1)),
+           pt_boot_g2 = map(.x = pt_configural, ~filter(.x, group == 2)))
+  
   # Create a frame for the parameter tables in both groups: based on a single group model
   pt_single <- parTable(cfa(model = Mod6facMI,
-                            data      = FinPrisonMales2,
+                            data      = predefined_data,
                             std.lv    = TRUE,
                             estimator = "WLSMV",
-                            do.fit    = TRUE))
-
-  # # Set up parameter table frame twice for each sample, on for each group
-  # tbl_of_b_samples <- tbl_of_b_samples %>% 
-  #   mutate(pt_1 = replicate(n = nrow(tbl_of_b_samples), expr = pt_single, simplify = FALSE),
-  #          pt_2 = replicate(n = nrow(tbl_of_b_samples), expr = pt_single, simplify = FALSE))
-  
-  # Split pt_configural into seperate tables for the two groups
-  tbl_of_b_samples <- tbl_of_b_samples %>% 
-    mutate(pt_configural_1 = map(pt_configural, ~filter(pt_configural, group == 1)),
-           pt_configural_2 = map(pt_configural, ~filter(pt_configural, group == 2)))
-  
-  # For each parameter table, replace values in the 'ustart' column (user defined values that the simulation is based on)
-  # with the values from the 'est' column (values estimated from the data)
-  
-  tbl_of_b_samples <- tbl_of_b_samples %>% 
-    mutate(pt_1 = map(pt_configural_1, ~mutate(. , ustart = est)),
-           pt_2 = map(pt_configural_2, ~mutate(. , ustart = est)))
-  
-  # Replace factor means and variance in pt2 with 0 and 1
+                            do.fit    = FALSE))
   
   
-  tbl_of_b_samples$pt_2[[1]]$op
+  # Set up the parameter table frame twice for each sample, once for each group
+  # Theese will, after modification, be used for simulating datasets
+  boots_samples <- boots_samples %>%
+    mutate(pt_for_sim_1 = replicate(n = nrow(boots_samples), expr = pt_single, simplify = FALSE),
+           pt_for_sim_2 = replicate(n = nrow(boots_samples), expr = pt_single, simplify = FALSE))
   
+  # Modify the 'ustart' values in these pts for simulation
   
-
+  # Use the function 'replace_coefs_in_pt()' to replace the start values in pt_for_sim_1 and pt_for_sim_2
+  # with the estimated parameter values in pt_configural_1 and pt_configural_2 (respectively)
+  boots_samples <- boots_samples %>% 
+    mutate(pt_for_sim_1 = map2(.x = pt_for_sim_1, .y = pt_boot_g1 , 
+                               .f = ~ replace_coefs_in_pt(pt.frame = .x, pt.replacement = .y)),
+           pt_for_sim_2 = map2(.x = pt_for_sim_1, .y = pt_boot_g2 , 
+                      .f = ~ replace_coefs_in_pt(pt.frame = .x, pt.replacement = .y)))
+  
+  # Replace factor MEANS in pt_for_sim_2 with 0
+  boots_samples <- boots_samples %>% 
+    # Replace the pt_for_sim_2 column with the same list of data.frames where...
+    mutate(pt_for_sim_2 = map(.x = pt_for_sim_2,
+                              # ... the 'ustart' column in each data.frame is replaced by...
+                              .f = ~mutate(.x, ustart = 
+                                            # the same column with some values replaced.
+                                            replace(ustart,
+                                                    # The replaced rows are defined by:
+                                                    op == "~1" & lhs %in% predefined_factors,
+                                                    # and the replacing value is 0.
+                                                    0))))
+  
+  # Replace factor VARIANCES in pt_for_sim_2 with 1 (same idea)
+  boots_samples <- boots_samples %>% 
+    # Replace the pt_for_sim_2 column with the same list of data.frames where...
+    mutate(pt_for_sim_2 = map(.x = pt_for_sim_2,
+                              # ... the 'ustart' column in each data.frame is replaced by...
+                              .f = ~mutate(.x, ustart = 
+                                            # the same column with some values replaced.
+                                            replace(ustart,
+                                                    # The replaced rows are defined by:
+                                                    op == "~1" & lhs %in% predefined_factors & rhs %in% predefined_factors,
+                                                    # and the replacing value is 1.
+                                                    1))))        
+           
+  
 
 
 # SIMULATE DATA
@@ -123,23 +169,50 @@ create_one_bootstrap <- function (dataset, grouping_var) {
                                           group = rep(c(1, 2), times = c(n1, n2)))}
   
   
-  group_sizes <- FinPrisonMales2 %>% group_by(ageMedSplit) %>% summarise("n" = n())
+  group_sizes <- predefined_data %>% group_by(ageMedSplit) %>% summarise("n" = n())
   n1 <- group_sizes$n[1]
   n2 <- group_sizes$n[2] #make sure lavaan interprets it the same way
   
-  test <- create_data(tbl_of_b_samples$pt_1[[1]], tbl_of_b_samples$pt_2[[1]], n1, n2)
+  test <- create_data(boots_samples$pt_for_sim_1[[1]], boots_samples$pt_for_sim_2[[1]], n1, n2)
+  nrow(test)
   
-  
-  pt1 <- tbl_of_b_samples$pt_1[[1]]
-  pt2 <- tbl_of_b_samples$pt_2[[1]]
-  
-  pt2 <- select(pt2, -plabel)
-  
-  pt1$free
-  
-  pt_single$free
+  boots_samples <-
+  boots_samples %>% 
+    mutate(sim_data = map2(.x = pt_for_sim_1, .y = pt_for_sim_2,
+                           .f = ~create_data(.x, .y, n1, n2)))
   
 # CALCULATE SCORE DISTRIBUTIONS
+  
+  # create one big data frame with indices for each simulted datset
+  
+  score_distributions <-
+  boots_samples %>% 
+    select(sample_nr, sim_data) %>% 
+    unnest(sim_data) %>% 
+  
+  # move to long format tidy data, 3 columns: dataset, item, score
+  # numer of rows = n_sample * items * participant
+    gather(key = item, value = score, -c(sample_nr, group)) %>% 
+    # Fix the fact that simulation creates scores [1, 2, 3] instead of [0, 1, 2]
+    mutate(score = score - 1) %>% 
+  # group_by dataset, item, and score 
+    group_by(sample_nr, item, score, group) %>% 
+    summarise(n = n()) %>% 
+    ungroup 
+  
+  
+  score_distributions %>% group_by(item) %>% 
+    
+    summarise(chi_test = chisq.test(x = group, y = score))
+  
+  score_distributions %>% 
+    group_by(item, score, group) %>% 
+    summarise(mean = mean(n), p2.5 = quantile(n, 0.025), p97.5 = quantile(n, 0.975)) 
+  # summarise( mean, quantile 2.5 and quantile 97.5)
+  # tibble with 5 columns: dataset, item, mean, q2.5, q97.5
+  
+
+  
 
 # FIT PATH MODEL
 

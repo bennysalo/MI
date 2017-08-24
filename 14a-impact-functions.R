@@ -22,6 +22,7 @@ get_impact_model <- function(base_model) {
 # pt.replacement = The parameter table from where the replacing parameter should be taken
 
 replace_coefs_in_pt <- function(pt.frame, pt.replacement) {
+  require(lavaan)
   # Ensure the same order of parameters in both paramter tables
   order_frame       <- order(pt.frame$op,       pt.frame$lhs,       pt.frame$rhs)
   order_replacement <- order(pt.replacement$op, pt.replacement$lhs, pt.replacement$rhs)

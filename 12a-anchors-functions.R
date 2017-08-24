@@ -19,11 +19,12 @@
     factor_means     <- paste(factors, '~ c(0, NA) * 1 \n', collapse = " ")
     
     # Define a model that works as base for a strong invariance model
+    # factor variance and mean free in second group
+    model_used      <- paste(base_model,'\n',
                              factor_variances,
                              factor_means)
     return(model_used)
-    # factor variance and mean free in second group
-    model_used      <- paste(base_model,'\n',
+   
   }
 
   
