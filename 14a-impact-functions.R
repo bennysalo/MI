@@ -29,7 +29,7 @@ replace_coefs_in_pt <- function(pt.frame, pt.replacement) {
   frame             <- pt.frame[order_frame, ]
   replacement       <- pt.replacement[order_replacement, ]
   
-  # Put in the same data.frame (to avoid differing row numbers claiming differences)
+  # Put in the same data.frame, side by side, (to avoid differing row numbers claiming differences)
   both           <- cbind(frame[,2:4], replacement[,2:4])
   
   # Continue only if the parameters are identical (otherwise give error message)

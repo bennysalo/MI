@@ -25,6 +25,7 @@ FinPrisonData$ic_drugUseAndEffects <- FinPrisonData$i_drugFrequency + FinPrisonD
 FinPrisonData$ic_drugHealthRisk <- FinPrisonData$i_drugIntravenous + FinPrisonData$i_drugEffectHealth
 
 
+
 # Recode into scale 0,1,2 with the 0 as 0, up to a mean of 1 = 1, above = 2
 require(car)
 FinPrisonData$ic_accomodation <- Recode(FinPrisonData$ic_accomodation, 
@@ -113,5 +114,5 @@ rm(list = c("drugFit2b", "drugMod2b", "FinPrisonData", "FinPrisonMales", "fs_dru
 ls()
 
 
-
+saveRDS(FinPrisonMales2, "C:/Users/benny_000/Dropbox/AAAKTUELLT/MI/FinPrisonMales2.rds")
 

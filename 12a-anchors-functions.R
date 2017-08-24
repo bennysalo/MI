@@ -5,6 +5,7 @@
 # the mean is fixed to 0 in the first group and free in the second
 # Argument: the basic model
   modify_means_and_var_to_strong <- function(base_model) {
+    require(lavaan)
     pt    <- lavaanify(base_model)
     # Extract a vector of the factors (the rows in the paramteter table that has the operator "=~",
     #   take the unique names in the 'left hand side' column from that subset of rows)
@@ -18,16 +19,17 @@
     factor_means     <- paste(factors, '~ c(0, NA) * 1 \n', collapse = " ")
     
     # Define a model that works as base for a strong invariance model
-    # factor variance and mean free in second group
-    model_used      <- paste(base_model,'\n',
                              factor_variances,
                              factor_means)
     return(model_used)
+    # factor variance and mean free in second group
+    model_used      <- paste(base_model,'\n',
   }
 
   
   # Function for getting the loading and threshold for a given item
   # Argument: the name of the item
+  require(lavaan)
   get_item_parameters <- function(base_model, items) {
   
   pt           <- lavaanify(base_model)
@@ -54,6 +56,7 @@
 
 
 run_partial_fit <-  function(base_model = base_model, used_data = used_data, grouping = grouping, item){
+  require(lavaan)
   # create a parameter table that can be used to identify pertinent parameters
 
   modified_model  <- modify_means_and_var_to_strong(base_model)
@@ -97,7 +100,7 @@ run_all_partial_models <- function(base_model = base_model, used_data = used_dat
 # Function for fitting strong invariance model
 
 run_strong_model <- function(base_model, used_data, grouping)  {
-  
+  require(lavaan)
   modified_model  <- modify_means_and_var_to_strong(base_model)
   strong_invariance_fit <- cfa(model     = modified_model,
                                 data      = used_data,
@@ -115,6 +118,9 @@ run_strong_model <- function(base_model, used_data, grouping)  {
 
 
 compare_partials_to_strong <- function(partial_models_list, strong_model) {
+  require(lavaan)
+  require(purrr)
+  require(dplyr)
   # Function for getting pertinenet statistics from ONE likelihood ratio test
   # Arguments(Fitted partial invarianc emodel, Fitted strong partial model)
   get_LRT_stat<- function(partial, strong) {
@@ -162,7 +168,7 @@ get_referent_items <- function(fit_table) {
 
 
 run_configural_model <- function(base_model, used_data, grouping, referent_items)  {
-  
+  require(lavaan)
     #  'std.lv = TRUE' will make sure that the first item in a factor is not chosen as a marker.
     #     The factor variances as defined in 'model' will however dictate the factor variances
     #  'group.equal = c("loadings", "thresholds")'
