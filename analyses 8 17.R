@@ -189,7 +189,7 @@ set.seed(2108)
   boots_samples <- boots_samples %>% 
     mutate(pt_for_sim_1 = map2(.x = pt_for_sim_1, .y = pt_boot_g1 , 
                                .f = ~ replace_coefs_in_pt(pt.frame = .x, pt.replacement = .y)),
-           pt_for_sim_2 = map2(.x = pt_for_sim_1, .y = pt_boot_g2 , 
+           pt_for_sim_2 = map2(.x = pt_for_sim_2, .y = pt_boot_g2 , 
                       .f = ~ replace_coefs_in_pt(pt.frame = .x, pt.replacement = .y)))
   
   # Replace factor MEANS in pt_for_sim_2 with 0
