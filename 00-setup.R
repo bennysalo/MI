@@ -1,18 +1,20 @@
-# Setup access to dropbox in AWS EC2
 library(RStudioAMI)
+passwd()
+
+
+# Setup access to dropbox in AWS EC2
+linkDropbox()
 excludeSyncDropbox("*")
 includeSyncDropbox("to aws")
 
 
 # Short setup
-install.packages(c("lavaan", "semTools", "simsem", "purrr"))
+install.packages(c("lavaan", "semTools", "simsem", "tidyverse"))
 library(lavaan)
 library(simsem)                 
 library(semTools)
-library(purrr)
+library(tidyverse)
 
-install.packages("dplyr")
-library(dplyr)
 
 
 # # Full setup

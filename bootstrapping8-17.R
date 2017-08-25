@@ -1,6 +1,6 @@
 # rm(list = ls())
-set.seed(2108)
 
+install.packages(c("lavaan", "semTools", "simsem", "tidyverse"))
 library(tidyverse)
 library(lavaan)
 library(simsem)
@@ -8,6 +8,7 @@ library(simsem)
 # LOAD DATA
 
 FinPrisonMales2 <- readRDS("C:/Users/benny_000/Dropbox/AAAKTUELLT/MI/FinPrisonMales2.rds")
+FinPrisonMales2 <- readRDS("~/Dropbox/to aws/FinPrisonMales2.rds")
 
 
 
@@ -82,7 +83,8 @@ create_one_bootstrap <- function (dataset, grouping_var) {
     ungroup() 
 }
 
-  
+set.seed(2108)
+ 
   boots_samples <- 
     # Create 'n_samples' copies of the original data i one big data.frame
     map_df(predefined_data, rep.int, times = n_samples) %>% 
@@ -107,7 +109,7 @@ create_one_bootstrap <- function (dataset, grouping_var) {
     parTable(fit)
   }  
   
-  # Setup the paramter table that will be used as the model for the analyses
+  # Setup the parameter table that will be used as the model for the analyses
   # Grab the parameter table from the configural fit in the preliminary analyses
   orig_configural_pt <- parTable(mod1_prel_results$configural_fit)
   # Replace start values with the estimated parameters in the original sample
