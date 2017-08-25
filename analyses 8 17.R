@@ -1,4 +1,4 @@
-# rm(list = ls())
+rm(list = ls())
 
 install.packages(c("lavaan", "semTools", "simsem", "tidyverse"))
 library(tidyverse)
@@ -7,7 +7,7 @@ library(simsem)
 
 # LOAD DATA
 
-FinPrisonMales2 <- readRDS("C:/Users/benny_000/Dropbox/AAAKTUELLT/MI/FinPrisonMales2.rds")
+FinPrisonMales2 <- readRDS("C:/Users/benny_000/Dropbox/to aws//FinPrisonMales2.rds")
 FinPrisonMales2 <- readRDS("~/Dropbox/to aws/FinPrisonMales2.rds")
 
 
@@ -33,7 +33,8 @@ items <- subset(lavaanify(predefined_model), op == "=~")$rhs
 
 predefined_grouping <- "ageMedSplit"
 
-predefined_data     <- select(FinPrisonMales2, items, predefined_grouping)
+column_numbers <- which(names(FinPrisonMales2) %in% c(items, predefined_grouping))
+predefined_data     <- select(FinPrisonMales2, column_numbers)
 
 n_samples           <- 2
 
@@ -128,6 +129,39 @@ set.seed(2108)
   rm(configural_pts)
   
 # CREATE PARAMETER TABLES THAT CAN BE USED FOR SIMULATION
+  
+  # Function for replacing the 'ustart' values in a parameter table 
+  # with the fitted coefficents from another parameter table
+  # Returns a paramter table that can be used with 'lavaan:simulateData' 
+  # Setup for use in functions 'create_invariant_data' and 'create_biased_data'
+  #c Takes arguments:
+  # pt.frame = The paramenter table where a parameter should be replaced and then returned
+  # pt.replacement = The parameter table from where the replacing parameter should be taken
+  replace_coefs_in_pt <- function(pt.frame, pt.replacement) {
+    require(lavaan)
+    # Ensure the same order of parameters in both paramter tables
+    order_frame       <- order(pt.frame$op,       pt.frame$lhs,       pt.frame$rhs)
+    order_replacement <- order(pt.replacement$op, pt.replacement$lhs, pt.replacement$rhs)
+    
+    frame             <- pt.frame[order_frame, ]
+    replacement       <- pt.replacement[order_replacement, ]
+    
+    # Put in the same data.frame, side by side, (to avoid differing row numbers claiming differences)
+    both           <- cbind(frame[,2:4], replacement[,2:4])
+    
+    # Continue only if the parameters are identical (otherwise give error message)
+    if (!(identical(both[,1:3], both[,4:6]))) {
+      stop("Table parameters do not match", call. = FALSE) }
+    
+    # Replace the 'ustart' values in the frame with the coefficients in the replacing parameter table
+    frame$ustart <- replacement$est
+    # Return in original order 
+    # and only the columns from output of a arbitrary model in lavaan:lavaanify
+    return(frame[order(frame$id), names(lavaanify('factor =~ item'))])
+  }
+  
+  
+  
 
   # Split pt_configural into seperate tables for the two groups: 'pt_boot_1' and 'pt_boot_2'
   boots_samples <- boots_samples %>% 
