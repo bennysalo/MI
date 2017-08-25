@@ -212,7 +212,7 @@ run_configural_model <- function(base_model, used_data, grouping, referent_items
 
 
 # Function for doing all tests relating to finding referent items
-analyses_step_2 <- function(base_model, used_data, grouping, item_vector) {
+run_prel_analyses <- function(base_model, used_data, grouping, item_vector) {
   results <- list()
   # 1. Run partial models
   results[["partial_fits"]] <- run_all_partial_models(base_model, used_data, grouping, item_vector)
@@ -241,9 +241,10 @@ analyses_step_2 <- function(base_model, used_data, grouping, item_vector) {
   # 6. Fit configural model
   results[["configural_fit"]]                   <- 
     run_configural_model(base_model, used_data, grouping, results[["referent_items"]])
-  # 7. TEst invariance by comparing configural and strong invariance models
+  # 7. Test invariance by comparing configural and strong invariance models
   results[["test_strong_invariance"]]           <-
     lavTestLRT(results[["configural_fit"]], results[["strong_fit"]], method = "satorra.bentler.2010")
+  # 8. Record warnings
   results[["warnings"]]                         <- warnings()
   return(results)
 }

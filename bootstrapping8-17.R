@@ -1,46 +1,73 @@
-rm(list = ls())
+# rm(list = ls())
 set.seed(2108)
 
 library(tidyverse)
 library(lavaan)
+library(simsem)
 
 # LOAD DATA
 
 FinPrisonMales2 <- readRDS("C:/Users/benny_000/Dropbox/AAAKTUELLT/MI/FinPrisonMales2.rds")
 
 
-# Predefine objects that will be used several times
-predefined_model    <- Mod6facMI
-predefined_data     <- FinPrisonMales2
+
+# PREDIFINE USED OBJECTS
+
+predefined_model    <- ' 
+  economy    =~ i_financialManagement + i_financialObstacles + i_financialSituation + 
+                i_dailyLifeManagement + ic_accomodation +  i_workApplication
+  alcohol    =~ i_alcFrequency + i_alcEffectWork + i_alcEffectRelations + i_alcEffectHealth +
+                i_alcWithMeds + i_alcMotivationTreat + i_alcViolence
+  change     =~ i_motivationChange + i_attitudeStaff + i_attitudeSupervision + i_othersView + i_attitudeHostile +
+                i_insight + i_manipulative + i_attitudeProcrime + i_socialSkills + i_alcMotivationTreat +
+                i_instrumentalAggression + i_workAttitude
+  drugs      =~ i_peersCriminal + i_riskSeeking + i_drugHistory +ifact_drugUse +
+                i_alcWithMeds + i _attitudeProcrime
+  aggression =~ i_impulsive + i_alcViolence + i_domViolPerp + i_instrumentalAggression + i_attitudeHostile +
+                i_othersView + i_attitudeStaff
+  employment =~ i_workHistory + i_eduNeed + i_eduAttitude + i_workAttitude +
+                i_remedialTeaching + i_workApplication'
+
+items <- subset(lavaanify(predefined_model), op == "=~")$rhs
+
 predefined_grouping <- "ageMedSplit"
+
+predefined_data     <- select(FinPrisonMales2, items, predefined_grouping)
+
 n_samples           <- 2
 
 predefined_factors  <- subset(lavaanify(predefined_model), op == "=~")
 predefined_factors  <- unique(predefined_factors$lhs)
 
+predefined_path_model <- paste(predefined_model, '\n', 
+                               paste(predefined_factors, '~ group \n', collapse = " "))
 
 
-# IDENTIFY REFERENT ITEMS
 
-# create a vector of item names for items that only load on one factor
-unidim_items <- subset(lavaanify(predefined_model), op == "=~")$rhs
+
+
+# RUN PRELIMINARY ANALYSES, INCLUDING FINDING REFERENT ITEMS
+
 # Pick items that only occur once in the parameter table
-unidim_items <- names(table(unidim_items))[table(unidim_items) == 1]
+# (candidates as referent items)
+unidim_items <- names(table(items))[table(items) == 1]
 
 
 # Run a set of preliminary analyses
 # Median split on AGE
 print(Sys.time())
 start<-Sys.time()
-mod1_prel_results <- analyses_step_2(base_model = predefined_model, 
-                                     used_data  = predefined_data, 
-                                     grouping   = predefined_grouping, 
-                                     item_vector = unidim_items)
+mod1_prel_results <- run_prel_analyses(base_model = predefined_model, 
+                                       used_data  = predefined_data, 
+                                       grouping   = predefined_grouping, 
+                                       item_vector = unidim_items)
 
 Sys.time()-start
 
-summary(mod1_prel_results)
 
+
+print(Sys.time())
+start2<-Sys.time()
 
 
 # BOOTSTRAP SAMPLES  
@@ -161,6 +188,7 @@ create_one_bootstrap <- function (dataset, grouping_var) {
 # SIMULATE DATA
 
   create_data<- function (pt1, pt2, n1, n2) {
+    require(lavaan)
       simulated_data.group1 <- simulateData(pt1, sample.nobs = n1)
       simulated_data.group2 <- simulateData(pt2, sample.nobs = n2)
       simulated_data        <- rbind(simulated_data.group1, simulated_data.group2)
@@ -179,8 +207,10 @@ create_one_bootstrap <- function (dataset, grouping_var) {
   boots_samples <-
   boots_samples %>% 
     mutate(sim_data = map2(.x = pt_for_sim_1, .y = pt_for_sim_2,
-                           .f = ~create_data(.x, .y, n1, n2)))
-  
+                           .f = ~create_data(.x, .y, n1, n2))) %>% 
+    # make all variables ordered
+    mutate(sim_data = map(.x = sim_data, .f = ~mutate_all(.x, ordered)))
+
 # CALCULATE SCORE DISTRIBUTIONS
   
   # create one big data frame with indices for each simulted datset
@@ -215,9 +245,14 @@ create_one_bootstrap <- function (dataset, grouping_var) {
   
 
 # FIT PATH MODEL
+  simulation_results <-
+    simsem::sim(model     = predefined_path_model,
+              rawData   = boots_samples$sim_data,
+              lavaanfun = "sem",
+              std.lv    = TRUE,
+              estimator = "WLSMV")
 
-
-
-
+  
+  Sys.time()-start2
 
 
