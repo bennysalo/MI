@@ -135,7 +135,7 @@ set.seed(2108)
            pt_boot_g2 = map(.x = pt_configural, ~filter(.x, group == 2)))
   
   # Create a frame for the parameter tables in both groups: based on a single group model
-  pt_single <- parTable(cfa(model = Mod6facMI,
+  pt_single <- parTable(cfa(model = predefined_model,
                             data      = predefined_data,
                             std.lv    = TRUE,
                             estimator = "WLSMV",
