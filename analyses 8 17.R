@@ -1,18 +1,20 @@
-rm(list = ls())
+# rm(list = ls())
 
-install.packages(c("lavaan", "semTools", "simsem", "tidyverse"))
+# install.packages(c("lavaan", "semTools", "simsem", "tidyverse"))
 library(tidyverse)
 library(lavaan)
 library(simsem)
+library(parallel)
 
 # LOAD DATA
 
 FinPrisonMales2 <- readRDS("C:/Users/benny_000/Dropbox/to aws//FinPrisonMales2.rds")
 FinPrisonMales2 <- readRDS("~/Dropbox/to aws/FinPrisonMales2.rds")
 
-
-
 # PREDIFINE USED OBJECTS
+predefined_grouping <- "ageMedSplit"
+n_samples           <- 2
+
 
 predefined_model    <- ' 
   economy    =~ i_financialManagement + i_financialObstacles + i_financialSituation + 
@@ -31,12 +33,8 @@ predefined_model    <- '
 
 items <- subset(lavaanify(predefined_model), op == "=~")$rhs
 
-predefined_grouping <- "ageMedSplit"
-
 column_numbers <- which(names(FinPrisonMales2) %in% c(items, predefined_grouping))
 predefined_data     <- select(FinPrisonMales2, column_numbers)
-
-n_samples           <- 2
 
 predefined_factors  <- subset(lavaanify(predefined_model), op == "=~")
 predefined_factors  <- unique(predefined_factors$lhs)
@@ -116,9 +114,21 @@ set.seed(2108)
   # Replace start values with the estimated parameters in the original sample
   orig_configural_pt$ustart <- orig_configural_pt$est
   
+  # Set up clusters for parallel calculations
+  
+  cl <- makeCluster(3)
+  
+  clusterExport(cl, "get_parTable")
+  clusterExport(cl, "orig_configural_pt")
+  clusterExport(cl, "predefined_grouping")
+  clusterEvalQ(cl, library(lavaan))
+  
   # Run configural invariance model and record the parameter table for each bootstrap sample
 
-  configural_pts <- lapply(boots_samples$boots, get_parTable, orig_pt = orig_configural_pt)
+  configural_pts <- parLapply(cl, boots_samples$boots, get_parTable, orig_pt = orig_configural_pt)
+  
+  
+  stopCluster()
 
   # Add parameter tables of configural fits to the tibble
   
@@ -237,9 +247,6 @@ set.seed(2108)
   n1 <- group_sizes$n[1]
   n2 <- group_sizes$n[2] #make sure lavaan interprets it the same way
   
-  test <- create_data(boots_samples$pt_for_sim_1[[1]], boots_samples$pt_for_sim_2[[1]], n1, n2)
-  nrow(test)
-  
   boots_samples <-
   boots_samples %>% 
     mutate(sim_data = map2(.x = pt_for_sim_1, .y = pt_for_sim_2,
@@ -286,7 +293,8 @@ set.seed(2108)
               rawData   = boots_samples$sim_data,
               lavaanfun = "sem",
               std.lv    = TRUE,
-              estimator = "WLSMV")
+              estimator = "WLSMV",
+              multicore = TRUE)
 
   
   Sys.time()-start2
