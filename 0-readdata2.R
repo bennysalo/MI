@@ -1,4 +1,4 @@
-# rm(list = ls())
+rm(list = ls())
 
 library(foreign, pos=4)
 FinPrisonData <- read.spss("../Dropbox/to aws/data/recidivists and nonrecidivsts all cases.sav", 
@@ -38,81 +38,99 @@ FinPrisonData$ic_drugHealthRisk <- Recode(FinPrisonData$ic_drugHealthRisk,
                                         recodes = "0 = 0; c(1, 2) = 1; c(3, 4) = 2")
 
 # Create variables for grouping in measurement invariance. 
-# 'A' for intuituvely lower risk, 'B' for intuitivly higher risk
+# Changed from previous A, B coding to ordered variables with expicit 1, 2 labels.
 
   # Participants with entire sentence in closed prison versus all other
 
-FinPrisonData$allClosed     <- as.factor(
+FinPrisonData$allClosed     <- as.ordered(
   ifelse(FinPrisonData$openPrison == "Closed prison" & 
            FinPrisonData$conditionalRelease == "No conditional release",
-         yes = "B-Entire sentence in closed prison", no = "A-Open prison or conditional relase"))
+         yes = "2-Entire sentence in closed prison", no = "1-Open prison or conditional relase"))
 
   # Median split for 'ageAtRelase'
 
 median(FinPrisonData$ageAtRelease)
 
-FinPrisonData$ageMedSplit   <- as.factor(
+FinPrisonData$ageMedSplit   <- as.ordered(
   ifelse(FinPrisonData$ageAtRelease > median(FinPrisonData$ageAtRelease), 
-         yes = "A-older", no = "B-younger"))
+         yes = "2-older", no = "1-younger"))
 
   # Present term is a sentence for a "violent crime" (assault or homicide)
 
-FinPrisonData$violentCrime  <- as.factor(
+FinPrisonData$violentCrime  <- as.ordered(
   ifelse(FinPrisonData$o_assault == 1 | FinPrisonData$o_homicide == 1,
-         yes = "B-violent crime", no = "A-no assault or homicide counts in present conviction"))
+         yes = "2-violent crime", no = "1-no assault or homicide counts in present conviction"))
 
   # first prison term or one or more previous prison terms
 
-FinPrisonData$prevReoffence <- as.factor(
+FinPrisonData$prevReoffence <- as.ordered(
   ifelse(FinPrisonData$ps_prisonTerms > 1,
-         yes = "B-one or more previous prison terms", no = "A-first prison term"))
+         yes = "2-one or more previous prison terms", no = "1-first prison term"))
 
+
+# Also, code a variable to indicate granting of conditional release
+# Rename original variable to avoid confusion
+
+names(FinPrisonData)[names(FinPrisonData) == "conditionalRelease"] <- 'conditionalReleaseOutcome'
+
+
+FinPrisonData$conditionalReleaseGranted <- as.ordered(
+    ifelse(FinPrisonData$conditionalReleaseOutcome == "No conditional release",
+           yes = "1-Not granted", no = "2-Granted"))
+
+
+  
 
 # Set pertinent variables to be ordered
 names(FinPrisonData)
-FinPrisonData[c(17:98, 101:107)] <- lapply(FinPrisonData[c(17:98, 101:107)], ordered)
+FinPrisonData[c(17:98, 101:108)] <- lapply(FinPrisonData[c(17:98, 101:108)], ordered)
 
-summary(FinPrisonData[c(1,104:107)])
+summary(FinPrisonData[c(1,104:108)])
 # Subset only males
 
 FinPrisonMales <- subset(FinPrisonData, subset = gender == "male")
 
 
-# Subset those who have at least some current drugproblems - for evaluating those items
+saveRDS(FinPrisonMales, "C:/Users/benny_000/Dropbox/AAAKTUELLT/MI/FinPrisonMales.rds")
 
-usedDrugs <- subset(FinPrisonMales, subset = ic_drugUseAndEffects >  0)
-noDrugs   <- subset(FinPrisonMales, subset = ic_drugUseAndEffects ==  0)
-
+### For now - don't do factor analysis on drug variables
 
 
-# Create factor scores for drug factor
-# The use of this model is established in -1a - best drug model.R'
-drugMod2b       <- 'DrugL =~ i_drugFrequency + i_drugCriminalActs + i_drugViolence + 
-                            i_drugEffectWork + i_drugEffectRelations +  ic_drugHealthRisk'
+# # Subset those who have at least some current drugproblems - for evaluating those items
+# 
+# usedDrugs <- subset(FinPrisonMales, subset = ic_drugUseAndEffects >  0)
+# noDrugs   <- subset(FinPrisonMales, subset = ic_drugUseAndEffects ==  0)
+# 
+# 
+# 
+# # Create factor scores for drug factor
+# # The use of this model is established in -1a - best drug model.R'
+# drugMod2b       <- 'DrugL =~ i_drugFrequency + i_drugCriminalActs + i_drugViolence + 
+#                             i_drugEffectWork + i_drugEffectRelations +  ic_drugHealthRisk'
+# 
+# drugFit2b <- cfa(drugMod2b, data = usedDrugs, std.lv = TRUE, estimator = "WLSMV")
+# 
+# # Calculate continous factor scores
+# fs_drugUse <- predict(drugFit2b)
+# 
+# # Collapse into familiar 0, 1, 2 scoring. Indiividuals in noDrugs get 0 individuals in usedDrugs get
+# # 1, or 2 based on median split of factor scores
+# ifact_drugUse <- as.ordered(cut(fs_drugUse, breaks = 2, labels = c(1,2)))
+# 
+# # add new variables to usedDrugs
+# 
+# usedDrugs <- cbind(usedDrugs, ifact_drugUse)
+# noDrugs   <- cbind(noDrugs, as.ordered(rep(0, times = nrow(noDrugs))))
+# 
+# names(noDrugs)[108] <- "ifact_drugUse"
+# 
+# FinPrisonMales2 <- rbind(noDrugs, usedDrugs)
 
-drugFit2b <- cfa(drugMod2b, data = usedDrugs, std.lv = TRUE, estimator = "WLSMV")
-
-# Calculate continous factor scores
-fs_drugUse <- predict(drugFit2b)
-
-# Collapse into familiar 0, 1, 2 scoring. Indiividuals in noDrugs get 0 individuals in usedDrugs get
-# 1, or 2 based on median split of factor scores
-ifact_drugUse <- as.ordered(cut(fs_drugUse, breaks = 2, labels = c(1,2)))
-
-# add new variables to usedDrugs
-
-usedDrugs <- cbind(usedDrugs, ifact_drugUse)
-noDrugs   <- cbind(noDrugs, as.ordered(rep(0, times = nrow(noDrugs))))
-
-names(noDrugs)[108] <- "ifact_drugUse"
-
-FinPrisonMales2 <- rbind(noDrugs, usedDrugs)
+# saveRDS(FinPrisonMales2, "C:/Users/benny_000/Dropbox/AAAKTUELLT/MI/FinPrisonMales2.rds")
 
 
 # Clean up environment. Delete objects that are not needed anymore.
-rm(list = c("drugFit2b", "drugMod2b", "FinPrisonData", "FinPrisonMales", "fs_drugUse", "ifact_drugUse", "noDrugs"))
-ls()
+rm(ls())
 
 
-saveRDS(FinPrisonMales2, "C:/Users/benny_000/Dropbox/AAAKTUELLT/MI/FinPrisonMales2.rds")
 
