@@ -71,14 +71,16 @@ FinPrisonData$prevReoffence <- as.ordered(
 # Also, code a variable to indicate granting of conditional release
 # Rename original variable to avoid confusion
 
-names(FinPrisonData)[names(FinPrisonData) == "conditionalRelease"] <- 'conditionalReleaseOutcome'
+names(FinPrisonData)[names(FinPrisonData) == "conditionalRelease"] <- "conditionalReleaseOutcome"
 
 
 FinPrisonData$conditionalReleaseGranted <- as.ordered(
     ifelse(FinPrisonData$conditionalReleaseOutcome == "No conditional release",
            yes = "1-Not granted", no = "2-Granted"))
 
+# Rename 'reoffender' to more appropriate term
 
+names(FinPrisonData)[names(FinPrisonData) == "reoffender"] <- "reoffenceThisTerm"
   
 
 # Set pertinent variables to be ordered
@@ -130,7 +132,7 @@ saveRDS(FinPrisonMales, "C:/Users/benny_000/Dropbox/AAAKTUELLT/MI/FinPrisonMales
 
 
 # Clean up environment. Delete objects that are not needed anymore.
-rm(ls())
+rm(list = ls())
 
 
 
