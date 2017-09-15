@@ -9,12 +9,12 @@ includeSyncDropbox("to aws")
 
 
 # Short setup
-install.packages(c("lavaan", "semTools", "simsem", "tidyverse"))
+install.packages(c("lavaan", "semTools", "simsem", "tidyverse", "parallel"))
 library(lavaan)
 library(simsem)                 
 library(semTools)
 library(tidyverse)
-
+library(parallel)
 
 
 # # Full setup

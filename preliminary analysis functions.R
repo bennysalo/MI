@@ -70,8 +70,9 @@ run_partial_fit <-  function(base_model = base_model, used_data = used_data, gro
                          std.lv        = TRUE, 
                          estimator     = "WLSMV", 
                          group         = grouping, 
-                         group.equal   = c("loadings","thresholds"), 
-                         group.partial = free_parameters)
+                         group.equal   = c("loadings","thresholds", "residuals"), 
+                         group.partial = free_parameters,
+                         parameterization = "theta")
   return(fit_partial)
 }
 
@@ -108,7 +109,8 @@ run_strong_model <- function(base_model, used_data, grouping)  {
                                std.lv    = TRUE,
                                estimator = "WLSMV",
                                group     = grouping,
-                               group.equal = c("loadings", "thresholds"))
+                               group.equal = c("loadings", "thresholds", "residuals"),
+                               parameterization = "theta")
   
 }
 
@@ -201,8 +203,9 @@ run_configural_model <- function(base_model, used_data, grouping, referent_items
                                    std.lv    = TRUE,
                                    estimator = "WLSMV",
                                    group     = grouping,
-                                   group.equal = c("loadings", "thresholds"),
-                                   group.partial = free_parameters)
+                                   group.equal = c("loadings", "thresholds", "residuals"),
+                                   group.partial = free_parameters,
+                                   parameterization = "theta")
   return(configural_invariance_fit)
 }
 

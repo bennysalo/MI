@@ -229,7 +229,7 @@ set.seed(2108)
                                                     1))))        
            
   
-
+filter(boots_samples$pt_for_sim_2[[1]], op == "~~" & lhs %in% predefined_factors & lhs == rhs)
 
 # SIMULATE DATA
 

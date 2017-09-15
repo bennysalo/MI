@@ -1,3 +1,8 @@
+boot_sample <- readRDS("C:/Users/benny_000/Dropbox/to aws/boot_samples_age_1000.rds")
+
+simulation_results <- readRDS("C:/Users/benny_000/Dropbox/to aws/simulation__results_age_100.rds")
+
+summary(simulation_results)
 # CALCULATE SCORE DISTRIBUTIONS
 
 # create one big data frame with indices for each simulted datset
@@ -40,9 +45,12 @@ test <-
 # tibble with 5 columns: dataset, item, mean, q2.5, q97.5
 
 test %>% 
-  filter(item == "i_alcEffectHealth") %>% 
+  # filter(item == "i_alcEffectHealth") %>% 
   ggplot(aes(as.factor(group))) +
   geom_bar(aes(weight = proportion, fill = ordered(score)), position = position_stack(reverse = TRUE)) +
   geom_errorbar(aes(ymin = propCIlo, ymax = propCIup), width = 0.2) +
-  coord_flip() 
+  coord_flip() +
+  facet_wrap(~ item)
+
+
 
